@@ -64,5 +64,12 @@ session_destroy();
 LogicHook::initialize();
 $GLOBALS['logic_hook']->call_custom_logic('Users', 'after_logout');
 
+// Hook:Maestrano
+$maestrano = MaestranoService::getInstance();
+if ($maestrano->isSsoEnabled()) {
+  header("Location: " . $maestrano->getSsoLogoutUrl());
+  exit;
+}
+
 /** @var AuthenticationController $authController */
 $authController->authController->logout();

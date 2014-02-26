@@ -40,7 +40,25 @@ include ('include/MVC/preDispatch.php');
 $startTime = microtime(true);
 require_once('include/entryPoint.php');
 ob_start();
+
+// Hook:Maestrano
+// Load Maestrano
+require 'maestrano/app/init/base.php';
+$maestrano = MaestranoService::getInstance();
+// Require authentication straight away if intranet
+// mode enabled
+if ($maestrano->isSsoIntranetEnabled()) {
+  if (!isset($_SESSION)) session_start();
+  if (!$maestrano->getSsoSession()->isValid()) {
+    header("Location: " . $maestrano->getSsoInitUrl());
+    exit;
+  }
+}
+
 require_once('include/MVC/SugarApplication.php');
+
+
+
 $app = new SugarApplication();
 $app->startSession();
 $app->execute();
