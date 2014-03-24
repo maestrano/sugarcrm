@@ -2119,7 +2119,7 @@ class SugarBean
      */
     function preprocess_fields_on_save()
     {
-        $GLOBALS['log']->deprecated('SugarBean.php: preprocess_fields_on_save() is deprecated');
+        //$GLOBALS['log']->deprecated('SugarBean.php: preprocess_fields_on_save() is deprecated');
     }
 
     /**
@@ -2254,7 +2254,7 @@ class SugarBean
                     break;
             }
             if ( $reformatted ) {
-                $GLOBALS['log']->deprecated('Formatting correction: '.$this->module_dir.'->'.$field.' had formatting automatically corrected. This will be removed in the future, please upgrade your external code');
+                //$GLOBALS['log']->deprecated('Formatting correction: '.$this->module_dir.'->'.$field.' had formatting automatically corrected. This will be removed in the future, please upgrade your external code');
             }
         }
 

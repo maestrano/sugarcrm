@@ -42,6 +42,7 @@ if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
  ********************************************************************************/
 
 require_once("include/SugarObjects/templates/company/Company.php");
+require_once('maestrano/app/init/soa.php');
 
 // Account is used to store account information.
 class Account extends Company {
@@ -155,6 +156,27 @@ class Account extends Company {
 			$_REQUEST['parent_name'] = '';
 			$_REQUEST['parent_id'] = '';
 		}
+	}
+
+	public function save($check_notify=false, $push_to_maestrano=true) 
+ 	{
+        $result = parent::save($check_notify);
+        
+        try {
+            if ($push_to_maestrano) {
+                // Get Maestrano Service
+                $maestrano = MaestranoService::getInstance();
+                
+                if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
+                    $mno_org=new MnoSoaOrganization($this->db, new MnoSoaBaseLogger());
+                    $mno_org->send($this);
+                }
+            }
+        } catch (Exception $ex) {
+            // skip
+        }
+        
+        return $result;
 	}
 
 	function get_summary_text()

@@ -146,6 +146,27 @@ class Contact extends Person {
 		parent::Person();
 	}
 
+	public function save($check_notify=false, $push_to_maestrano=true) 
+ 	{
+		$result = parent::save($check_notify);
+		
+		try {
+		    if ($push_to_maestrano) {
+		        // Get Maestrano Service
+		        $maestrano = MaestranoService::getInstance();
+
+		        if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
+		            $mno_org=new MnoSoaPerson($this->db, new MnoSoaBaseLogger());
+		            $mno_org->send($this);
+		        }
+		    }
+		} catch (Exception $ex) {
+		    // skip
+		}
+		
+		return $result;
+    }
+
 	function add_list_count_joins(&$query, $where)
 	{
 		// accounts.name
