@@ -12,7 +12,6 @@ class MnoSoaPerson extends MnoSoaBasePerson
 	$id = $this->getLocalEntityIdentifier();
 	
 	if (!empty($id)) {
-	    error_log("id is not empty, id = " . $id);
 	    $mno_id = $this->getMnoIdByLocalId($id);
 
 	    if ($this->isValidIdentifier($mno_id)) {
@@ -175,31 +174,31 @@ class MnoSoaPerson extends MnoSoaBasePerson
         
         if (!empty($org_local_id)) {
             $org_mno_id = $this->getMnoIdByLocalIdName($org_local_id, 'account');
-        } else {
-            $this->_role = null;
-            return;
-        }
+
         
-        if ($this->isValidIdentifier($org_mno_id)) {
-            $this->_log->debug(__FUNCTION__ . " mno_id = " . json_encode($org_mno_id));
-            $this->_role->organization->id = $org_mno_id->_id;
-            $this->_role->title = $this->push_set_or_delete_value($this->_local_entity->title);
-        } else if ($this->isDeletedIdentifier($org_mno_id)) {
-            // do not update
-            return;
+		    if ($this->isValidIdentifier($org_mno_id)) {
+		        $this->_log->debug(__FUNCTION__ . " mno_id = " . json_encode($org_mno_id));
+		        $this->_role->organization->id = $org_mno_id->_id;
+		        $this->_role->title = $this->push_set_or_delete_value($this->_local_entity->title);
+		    } else if ($this->isDeletedIdentifier($org_mno_id)) {
+		        // do not update
+		        return;
+		    } else {
+		        $org_contact = new Account();
+		        $org_contact->retrieve($org_local_id);
+		        
+		        $organization = new MnoSoaOrganization($this->_db, $this->_log);		
+		        $organization->send($org_contact);
+
+		        $org_mno_id = $this->getMnoIdByLocalId($org_local_id);
+
+		        if ($this->isValidIdentifier($org_mno_id)) {
+		            $this->_role->organization->id = $org_mno_id->_id;
+		            $this->_role->title = $this->push_set_or_delete_value($this->_local_entity->title);
+		        }
+		    }
         } else {
-            $org_contact = new Account();
-            $org_contact->retrieve($org_local_id);
-            
-            $organization = new MnoSoaOrganization($this->_db, $this->_log);		
-            $organization->send($org_contact);
-
-            $org_mno_id = $this->getMnoIdByLocalId($org_local_id);
-
-            if ($this->isValidIdentifier($org_mno_id)) {
-                $this->_role->organization->id = $org_mno_id->_id;
-                $this->_role->title = $this->push_set_or_delete_value($this->_local_entity->title);
-            }
+            $this->_role = (object) array();
         }
     }
     
@@ -258,7 +257,7 @@ class MnoSoaPerson extends MnoSoaBasePerson
         }
     }
     
-    protected function getLocalEntityIdentifier() {
+    public function getLocalEntityIdentifier() {
         return $this->_local_entity->id;
     }
 }

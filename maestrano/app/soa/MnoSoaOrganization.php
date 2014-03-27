@@ -200,7 +200,7 @@ class MnoSoaOrganization extends MnoSoaBaseOrganization
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
     }
     
-    protected function getLocalEntityIdentifier() {
+    public function getLocalEntityIdentifier() {
         return $this->_local_entity->id;
     }
 }

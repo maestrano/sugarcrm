@@ -119,7 +119,7 @@ class MnoSoaBasePerson extends MnoSoaBaseEntity
 	throw new Exception('Function '. __FUNCTION__ . ' must be overriden in MnoPerson class!');
     }
     
-    protected function getLocalEntityIdentifier() {
+    public function getLocalEntityIdentifier() {
         throw new Exception('Function '. __FUNCTION__ . ' must be overriden in MnoPerson class!');
     }
     
@@ -161,16 +161,16 @@ class MnoSoaBasePerson extends MnoSoaBaseEntity
         if ($this->_entity != null) { $msg['person']->entity = $this->_entity; }
         if ($this->_role != null) { $msg['person']->role = $this->_role; }
 	
-	$this->_log->debug(__FUNCTION__ . " after creating message array");
-	$result = json_encode($msg['person']);
+		$this->_log->debug(__FUNCTION__ . " after creating message array");
+		$result = json_encode($msg['person']);
 	
-	$this->_log->debug(__FUNCTION__ . " result = " . $result);
+		$this->_log->debug(__FUNCTION__ . " result = " . $result);
 	
-	return json_encode($msg['person']);
+		return json_encode($msg['person']);
     }
     
     protected function persist($mno_entity) {
-        $this->_log->debug(__FUNCTION__ . " mno_entity = " . json_encode($mno_entity));
+        $this->_log->debug(__CLASS__ . " " . __FUNCTION__ . " mno_entity = " . json_encode($mno_entity));
         
         if (!empty($mno_entity->person)) {
             $mno_entity = $mno_entity->person;
@@ -222,16 +222,17 @@ class MnoSoaBasePerson extends MnoSoaBaseEntity
                 $this->pullRole();
                 $this->_log->debug(__FUNCTION__ . " after role");
 
-                $this->_log->debug(__FUNCTION__ . " before savelocalentity");
                 $this->saveLocalEntity(false);
-                $this->_log->debug(__FUNCTION__ . " after savelocalentity");
             }
-            if ($is_new_id) {
-                $this->_log->debug(__FUNCTION__ . " before addIdMapEntry");
-                $this->addIdMapEntry($this->_local_entity->id, $this->_id);
-                $this->_log->debug(__FUNCTION__ . " after addIdMapEntry");
+
+            $local_entity_id = $this->getLocalEntityIdentifier();
+            $mno_entity_id = $this->_id;
+
+            if ($is_new_id && !empty($local_entity_id) && !empty($mno_entity_id)) {
+                $this->addIdMapEntry($local_entity_id, $mno_entity_id);
             }
         }
+        $this->_log->debug(__FUNCTION__ . " end persist");
     }
 }
 

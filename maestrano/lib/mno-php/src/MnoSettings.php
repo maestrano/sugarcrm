@@ -12,7 +12,7 @@ class MnoSettings
      * @var string
      */
     public $app_id = '';
-    
+
     /**
      * The name of the application.
      * @var string

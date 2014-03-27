@@ -42,7 +42,7 @@ if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
  ********************************************************************************/
 
 require_once("include/SugarObjects/templates/company/Company.php");
-require_once('maestrano/app/init/soa.php');
+require_once('maestrano/app/init/base.php');
 
 // Account is used to store account information.
 class Account extends Company {

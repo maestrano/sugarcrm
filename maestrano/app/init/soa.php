@@ -2,7 +2,6 @@
 //-----------------------------------------------
 // Define root folder and load base
 //-----------------------------------------------
-error_log("start soa.php");
 if (!defined('MAESTRANO_ROOT')) {
   define("MAESTRANO_ROOT", realpath(dirname(__FILE__) . '/../../'));
 }
