@@ -38,7 +38,7 @@ class MnoSoaPerson extends MnoSoaBasePerson
                 return constant('MnoSoaBaseEntity::STATUS_DELETED_ID');
             } else {
 		$this->_local_entity = new Contact();
-                $this->getName();
+                $this->pullName();
 		return constant('MnoSoaBaseEntity::STATUS_NEW_ID');
 	    }
 	}
@@ -108,15 +108,15 @@ class MnoSoaPerson extends MnoSoaBasePerson
         $this->_local_entity->primary_address_city = $this->pull_set_or_delete_value($this->_address->work->postalAddress->locality);
         $this->_local_entity->primary_address_state = $this->pull_set_or_delete_value($this->_address->work->postalAddress->region);
         $this->_local_entity->primary_address_postalcode = $this->pull_set_or_delete_value($this->_address->work->postalAddress->postalCode);
-        $country = $this->mapISO3166ToCountry($this->_address->work->postalAddress->country);
-        $this->_local_entity->primary_address_country = $this->pull_set_or_delete_value($country);
+        //$country = $this->mapISO3166ToCountry($this->_address->work->postalAddress->country);
+        //$this->_local_entity->primary_address_country = $this->pull_set_or_delete_value($country);
         // POSTAL ADDRESS #2 -> OTHER ADDRESS
         $this->_local_entity->alt_address_street = $this->pull_set_or_delete_value($this->_address->work->postalAddress2->streetAddress);
         $this->_local_entity->alt_address_city = $this->pull_set_or_delete_value($this->_address->work->postalAddress2->locality);
         $this->_local_entity->alt_address_state = $this->pull_set_or_delete_value($this->_address->work->postalAddress2->region);
         $this->_local_entity->alt_address_postalcode = $this->pull_set_or_delete_value($this->_address->work->postalAddress2->postalCode);
-        $country = $this->mapISO3166ToCountry($this->_address->work->postalAddress2->country);
-        $this->_local_entity->alt_address_country = $this->pull_set_or_delete_value($country);
+        //$country = $this->mapISO3166ToCountry($this->_address->work->postalAddress2->country);
+        //$this->_local_entity->alt_address_country = $this->pull_set_or_delete_value($country);
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
     }
     
@@ -160,9 +160,7 @@ class MnoSoaPerson extends MnoSoaBasePerson
     }
     
     protected function pushEntity() {
-	$this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " start ");
-        $this->_entity->customer = true;
-        $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
+	// DO NOTHING
     }
     
     protected function pullEntity() {
@@ -188,14 +186,16 @@ class MnoSoaPerson extends MnoSoaBasePerson
 		        $org_contact->retrieve($org_local_id);
 		        
 		        $organization = new MnoSoaOrganization($this->_db, $this->_log);		
-		        $organization->send($org_contact);
+		        $status = $organization->send($org_contact);
 
-		        $org_mno_id = $this->getMnoIdByLocalId($org_local_id);
+                        if ($status) {
+                            $org_mno_id = $this->getMnoIdByLocalId($org_local_id);
 
-		        if ($this->isValidIdentifier($org_mno_id)) {
-		            $this->_role->organization->id = $org_mno_id->_id;
-		            $this->_role->title = $this->push_set_or_delete_value($this->_local_entity->title);
-		        }
+                            if ($this->isValidIdentifier($org_mno_id)) {
+                                $this->_role->organization->id = $org_mno_id->_id;
+                                $this->_role->title = $this->push_set_or_delete_value($this->_local_entity->title);
+                            }
+                        }
 		    }
         } else {
             $this->_role = (object) array();
@@ -220,9 +220,11 @@ class MnoSoaPerson extends MnoSoaBasePerson
                 $notification->entity = "organizations";
                 $notification->id = $this->_role->organization->id;
                 $organization = new MnoSoaOrganization($this->_db, $this->_log);		
-                $organization->receiveNotification($notification);
-                $this->_local_entity->account_id = $this->pull_set_or_delete_value($organization->_local_entity->id);
-                $this->_local_entity->title = $this->pull_set_or_delete_value($this->_role->title);
+                $status = $organization->receiveNotification($notification);
+                if ($status) {
+                    $this->_local_entity->account_id = $this->pull_set_or_delete_value($organization->_local_entity->id);
+                    $this->_local_entity->title = $this->pull_set_or_delete_value($this->_role->title);
+                }
             }            
         }
     }

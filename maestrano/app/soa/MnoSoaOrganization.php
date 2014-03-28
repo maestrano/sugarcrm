@@ -12,7 +12,6 @@ class MnoSoaOrganization extends MnoSoaBaseOrganization
 	$id = $this->getLocalEntityIdentifier();
 	
 	if (!empty($id)) {
-	    error_log("id is not empty, id = " . $id);
 	    $mno_id = $this->getMnoIdByLocalId($id);
 	    
 	    if ($this->isValidIdentifier($mno_id)) {
@@ -133,13 +132,13 @@ class MnoSoaOrganization extends MnoSoaBaseOrganization
         $this->_local_entity->billing_address_city = $this->pull_set_or_delete_value($this->_address->postalAddress->locality);
         $this->_local_entity->billing_address_state = $this->pull_set_or_delete_value($this->_address->postalAddress->region);
         $this->_local_entity->billing_address_postalcode = $this->pull_set_or_delete_value($this->_address->postalAddress->postalCode);
-        $this->_local_entity->billing_address_country = $this->pull_set_or_delete_value($this->_address->postalAddress->country);
+        //$this->_local_entity->billing_address_country = $this->pull_set_or_delete_value($this->_address->postalAddress->country);
         // STREET ADDRESS -> SHIPPING ADDRESS
         $this->_local_entity->shipping_address_street = $this->pull_set_or_delete_value($this->_address->streetAddress->streetAddress);
         $this->_local_entity->shipping_address_city = $this->pull_set_or_delete_value($this->_address->streetAddress->locality);
         $this->_local_entity->shipping_address_state = $this->pull_set_or_delete_value($this->_address->streetAddress->region);
         $this->_local_entity->shipping_address_postalcode = $this->pull_set_or_delete_value($this->_address->streetAddress->postalCode);
-        $this->_local_entity->shipping_address_country = $this->pull_set_or_delete_value($this->_address->streetAddress->country);
+        //$this->_local_entity->shipping_address_country = $this->pull_set_or_delete_value($this->_address->streetAddress->country);
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
     }
     
@@ -185,9 +184,7 @@ class MnoSoaOrganization extends MnoSoaBaseOrganization
     }
     
     protected function pushEntity() {
-        $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " start ");
-        $this->_entity->customer = true;
-        $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
+        // DO NOTHING
     }
     
     protected function pullEntity() {

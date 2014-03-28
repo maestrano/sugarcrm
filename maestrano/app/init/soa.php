@@ -29,5 +29,4 @@ require_once APP_DIR . '/modules/Contacts/Contact.php';
 $opts = array();
 $opts['db_connection'] = DBManagerFactory::getInstance();
 $GLOBALS['log'] = LoggerManager::getLogger('SugarCRM');
-error_log("end soa.php");
 ?>

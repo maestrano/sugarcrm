@@ -231,7 +231,7 @@ class MnoSoaBaseOrganization extends MnoSoaBaseEntity
 
                 $this->saveLocalEntity(false);
             }
-            
+
             $local_entity_id = $this->getLocalEntityIdentifier();
             $mno_entity_id = $this->_id;
             

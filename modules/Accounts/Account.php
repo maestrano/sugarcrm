@@ -160,24 +160,40 @@ class Account extends Company {
 
 	public function save($check_notify=false, $push_to_maestrano=true) 
  	{
-        $result = parent::save($check_notify);
-        
-        try {
-            if ($push_to_maestrano) {
-                // Get Maestrano Service
-                $maestrano = MaestranoService::getInstance();
-                
-                if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
-                    $mno_org=new MnoSoaOrganization($this->db, new MnoSoaBaseLogger());
-                    $mno_org->send($this);
+            $result = parent::save($check_notify);
+
+            try {
+                if ($push_to_maestrano) {
+                    // Get Maestrano Service
+                    $maestrano = MaestranoService::getInstance();
+
+                    if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
+                        $mno_org=new MnoSoaOrganization($this->db, new MnoSoaBaseLogger());
+                        $mno_org->send($this);
+                    }
                 }
+            } catch (Exception $ex) {
+                // skip
             }
-        } catch (Exception $ex) {
-            // skip
+        
+            return $result;
+	}
+        
+    function mark_deleted($id)
+    {
+        $result = parent::mark_deleted($id);
+        
+        // Get Maestrano Service
+        $maestrano = MaestranoService::getInstance();
+
+        // DISABLED DELETE NOTIFICATIONS
+        if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
+            $mno_org=new MnoSoaOrganization($this->db, new MnoSoaBaseLogger());
+            $mno_org->sendDeleteNotification($id);
         }
         
         return $result;
-	}
+    }
 
 	function get_summary_text()
 	{
