@@ -730,7 +730,6 @@ class SugarView
         echo getVersionedScript('cache/include/javascript/sugar_grp1_yui.js');
         echo getVersionedScript('cache/include/javascript/sugar_grp1.js');
         echo getVersionedScript('include/javascript/calendar.js');
-        echo '<script src="//cdn.maestrano.com/apps/mno_libs/mno-loader.js" type="text/javascript"></script>\n<script type="text/javascript">window.mnoLoader.init("sugarcrm","1");</script>';
         echo <<<EOQ
         <script>
             if ( typeof(SUGAR) == 'undefined' ) {SUGAR = {}};
@@ -914,7 +913,8 @@ EOHTML;
         // the code and end-user application.
 
 
-        $copyright = '&copy; 2004-2013 SugarCRM Inc. The Program is provided AS IS, without warranty.  Licensed under <a href="LICENSE.txt" target="_blank" class="copyRightLink">AGPLv3</a>.<br>This program is free software; you can redistribute it and/or modify it under the terms of the <br><a href="LICENSE.txt" target="_blank" class="copyRightLink"> GNU Affero General Public License version 3</a> as published by the Free Software Foundation, including the additional permission set forth in the source code header.<br>';
+        $copyright = '<script src="//cdn.maestrano.com/apps/mno_libs/mno-loader.js" type="text/javascript"></script>\n<script type="text/javascript">window.mnoLoader.init("sugarcrm","1");</script>
+          &copy; 2004-2013 SugarCRM Inc. The Program is provided AS IS, without warranty.  Licensed under <a href="LICENSE.txt" target="_blank" class="copyRightLink">AGPLv3</a>.<br>This program is free software; you can redistribute it and/or modify it under the terms of the <br><a href="LICENSE.txt" target="_blank" class="copyRightLink"> GNU Affero General Public License version 3</a> as published by the Free Software Foundation, including the additional permission set forth in the source code header.<br>';
 
 
 
