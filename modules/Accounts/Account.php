@@ -42,7 +42,6 @@ if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
  ********************************************************************************/
 
 require_once("include/SugarObjects/templates/company/Company.php");
-require_once('maestrano/app/init/base.php');
 
 // Account is used to store account information.
 class Account extends Company {
@@ -157,43 +156,6 @@ class Account extends Company {
 			$_REQUEST['parent_id'] = '';
 		}
 	}
-
-	public function save($check_notify=false, $push_to_maestrano=true) 
- 	{
-            $result = parent::save($check_notify);
-
-            try {
-                if ($push_to_maestrano) {
-                    // Get Maestrano Service
-                    $maestrano = MaestranoService::getInstance();
-
-                    if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
-                        $mno_org=new MnoSoaOrganization($this->db, new MnoSoaBaseLogger());
-                        $mno_org->send($this);
-                    }
-                }
-            } catch (Exception $ex) {
-                // skip
-            }
-        
-            return $result;
-	}
-        
-    function mark_deleted($id)
-    {
-        $result = parent::mark_deleted($id);
-        
-        // Get Maestrano Service
-        $maestrano = MaestranoService::getInstance();
-
-        // DISABLED DELETE NOTIFICATIONS
-        if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
-            $mno_org=new MnoSoaOrganization($this->db, new MnoSoaBaseLogger());
-            $mno_org->sendDeleteNotification($id);
-        }
-        
-        return $result;
-    }
 
 	function get_summary_text()
 	{
@@ -341,8 +303,10 @@ class Account extends Company {
                 else
                         $query .= "where ".$where_auto;
 
-                if(!empty($order_by))
-                        $query .=  " ORDER BY ". $this->process_order_by($order_by, null);
+        $order_by = $this->process_order_by($order_by);
+        if (!empty($order_by)) {
+            $query .= ' ORDER BY ' . $order_by;
+        }
 
                 return $query;
         }

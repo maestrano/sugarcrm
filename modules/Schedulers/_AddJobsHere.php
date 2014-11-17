@@ -66,6 +66,7 @@ $job_strings = array (
     12 => 'sendEmailReminders',
     14 => 'cleanJobQueue',
     15 => 'removeDocumentsFromFS',
+    16 => 'trimSugarFeeds',
 
 );
 
@@ -285,8 +286,8 @@ function pruneDatabase() {
 
 	$db = DBManagerFactory::getInstance();
 	$tables = $db->getTablesArray();
+    $queryString = array();
 
-//_ppd($tables);
 	if(!empty($tables)) {
 		foreach($tables as $kTable => $table) {
 			// find tables with deleted=1
@@ -304,7 +305,7 @@ function pruneDatabase() {
 
 			$qDel = "SELECT * FROM $table WHERE deleted = 1";
 			$rDel = $db->query($qDel);
-			$queryString = array();
+
 			// make a backup INSERT query if we are deleting.
 			while($aDel = $db->fetchByAssoc($rDel, false)) {
 				// build column names
@@ -473,6 +474,34 @@ function removeDocumentsFromFS()
 
     return $return;
 }
+
+
+/**
++ * Job 16
++ * this will trim all records in sugarfeeds table that are older than 30 days or specified interval
++ */
+
+function trimSugarFeeds()
+{
+    global $sugar_config, $timedate;
+    $GLOBALS['log']->info('----->Scheduler fired job of type trimSugarFeeds()');
+    $db = DBManagerFactory::getInstance();
+
+    //get the pruning interval from globals if it's specified
+    $prune_interval = !empty($GLOBALS['sugar_config']['sugarfeed_prune_interval']) && is_numeric($GLOBALS['sugar_config']['sugarfeed_prune_interval']) ? $GLOBALS['sugar_config']['sugarfeed_prune_interval'] : 30;
+
+
+    //create and run the query to delete the records
+    $timeStamp = $db->convert("'". $timedate->asDb($timedate->getNow()->get("-".$prune_interval." days")) ."'" ,"datetime");
+    $query = "DELETE FROM sugarfeed WHERE date_modified < $timeStamp";
+
+
+    $GLOBALS['log']->info("----->Scheduler is about to trim the sugarfeed table by running the query $query");
+    $db->query($query);
+
+    return true;
+}
+
 
 
 function cleanJobQueue($job)

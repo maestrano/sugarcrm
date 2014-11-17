@@ -43,8 +43,6 @@ if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
  ********************************************************************************/
 
 require_once('include/SugarObjects/templates/person/Person.php');
-require_once('maestrano/app/init/base.php');
-
 // Contact is used to store customer information.
 class Contact extends Person {
     var $field_name_map;
@@ -147,43 +145,6 @@ class Contact extends Person {
 	function Contact() {
 		parent::Person();
 	}
-
-	public function save($check_notify=false, $push_to_maestrano=true) 
- 	{
-		$result = parent::save($check_notify);
-		
-		try {
-		    if ($push_to_maestrano) {
-		        // Get Maestrano Service
-		        $maestrano = MaestranoService::getInstance();
-
-		        if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
-		            $mno_org=new MnoSoaPerson($this->db, new MnoSoaBaseLogger());
-		            $mno_org->send($this);
-		        }
-		    }
-		} catch (Exception $ex) {
-		    // skip
-		}
-		
-		return $result;
-        }
-        
-    function mark_deleted($id)
-    {
-        $result = parent::mark_deleted($id);
-        
-        // Get Maestrano Service
-        $maestrano = MaestranoService::getInstance();
-
-        // DISABLED DELETE NOTIFICATIONS
-        if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
-            $mno_org=new MnoSoaPerson($this->db, new MnoSoaBaseLogger());
-            $mno_org->sendDeleteNotification($id);
-        }
-        
-        return $result;
-    }
 
 	function add_list_count_joins(&$query, $where)
 	{
@@ -291,11 +252,13 @@ class Contact extends Person {
 
 
 		$ret_array['where'] = $where_query;
-		$orderby_query = '';
-		if(!empty($order_by)){
-		    $orderby_query =  " ORDER BY ". $this->process_order_by($order_by, null);
-		}
-		$ret_array['order_by'] = $orderby_query ;
+        $ret_array['order_by'] = '';
+
+        //process order by and add if it's not empty
+        $order_by = $this->process_order_by($order_by);
+        if (!empty($order_by)) {
+            $ret_array['order_by'] = ' ORDER BY ' . $order_by;
+        }
 
 		if($return_array)
     	{
@@ -342,8 +305,10 @@ class Contact extends Person {
                 else
                         $query .= "where ".$where_auto;
 
-                if(!empty($order_by))
-                        $query .=  " ORDER BY ". $this->process_order_by($order_by, null);
+        $order_by = $this->process_order_by($order_by);
+        if (!empty($order_by)) {
+            $query .= ' ORDER BY ' . $order_by;
+        }
 
                 return $query;
         }

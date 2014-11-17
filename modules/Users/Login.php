@@ -45,14 +45,6 @@ if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
 /** @var AuthenticationController $authController */
 $authController->authController->pre_login();
 
-// Hook:Maestrano
-// Redirect to SSO login
-$maestrano = MaestranoService::getInstance();
-if ($maestrano->isSsoEnabled()) {
-  header("Location: " . $maestrano->getSsoInitUrl());
-  exit;
-}
-
 global $current_language, $mod_strings, $app_strings;
 if(isset($_REQUEST['login_language'])){
     $lang = $_REQUEST['login_language'];
