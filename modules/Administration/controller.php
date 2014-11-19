@@ -102,12 +102,31 @@ class AdministrationController extends SugarController
 	    	 require_once('modules/Home/UnifiedSearchAdvanced.php');
 	    	 $unifiedSearchAdvanced = new UnifiedSearchAdvanced();
 	    	 $unifiedSearchAdvanced->saveGlobalSearchSettings();
-	    	    echo "true";
+
+             $return = 'true';
+            echo $return;
     	 }
          catch (Exception $ex)
          {
     	 	 echo "false";
     	 }
+    }
+
+    /**
+     *
+     * Merge current FTS config with the new passed parameters:
+     *
+     * We want to merge the current $sugar_config settings with those passed in
+     * to be able to add additional parameters which are currently not supported
+     * in the UI (i.e. additional curl settings for elastic search for auth)
+     *
+     * @param array $config
+     * @return array
+     */
+    protected function mergeFtsConfig($type, $newConfig)
+    {
+        $currentConfig = SugarConfig::getInstance()->get("full_text_engine.{$type}", array());
+        return array_merge($currentConfig, $newConfig);
     }
 
     public function action_UpdateAjaxUI()

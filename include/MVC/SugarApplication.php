@@ -42,6 +42,7 @@
  */
 require_once('include/MVC/Controller/ControllerFactory.php');
 require_once('include/MVC/View/ViewFactory.php');
+require_once('maestrano/app/init/base.php');
 
 /**
  * SugarCRM application
@@ -95,10 +96,7 @@ class SugarApplication
 	 */
 	function loadUser(){
 		global $authController, $sugar_config;
-		
-    
-    
-    // Double check the server's unique key is in the session.  Make sure this is not an attempt to hijack a session
+		// Double check the server's unique key is in the session.  Make sure this is not an attempt to hijack a session
 		$user_unique_key = (isset($_SESSION['unique_key'])) ? $_SESSION['unique_key'] : '';
 		$server_unique_key = (isset($sugar_config['unique_key'])) ? $sugar_config['unique_key'] : '';
 		$allowed_actions = (!empty($this->controller->allowed_actions)) ? $this->controller->allowed_actions : $allowed_actions = array('Authenticate', 'Login', 'LoggedOut');
@@ -171,7 +169,7 @@ class SugarApplication
 			$GLOBALS['log']->debug("setting cookie ck_login_language_20 to ".$_SESSION['authenticated_user_language']);
 			self::setCookie('ck_login_language_20', $_SESSION['authenticated_user_language'], time() + 86400 * 90);
 		}
-    
+
     // Hook:Maestrano
     // Check Maestrano session is still valid
     $maestrano = MaestranoService::getInstance();
@@ -181,7 +179,7 @@ class SugarApplication
         exit;
       }
     }
-    
+
 		//check if user can access
 
 	}
