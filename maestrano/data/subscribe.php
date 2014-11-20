@@ -32,6 +32,12 @@ if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
         $mno_person->receiveNotification($notification);
       }
       break;
+    case "TAXCODES":
+      if (class_exists('MnoSoaTax')) {
+        $mno_tax = new MnoSoaTax($opts['db_connection'], new MnoSoaBaseLogger());
+        $mno_tax->receiveNotification($notification);
+      }
+      break;
     case "ITEMS":
       if (class_exists('MnoSoaItem')) {
         $mno_item = new MnoSoaItem($opts['db_connection'], new MnoSoaBaseLogger());   
