@@ -35,7 +35,6 @@ class MnoSoaItem extends MnoSoaBaseItem
     
     protected function pullId() {
       $this->_log->debug(__FUNCTION__ . " start " . $this->_id);
-      $_REQUEST = array();
         
       if (!empty($this->_id)) {
         $local_id = $this->getLocalIdByMnoId($this->_id);
@@ -182,7 +181,7 @@ class MnoSoaItem extends MnoSoaBaseItem
     }
 
     protected function saveLocalEntity($push_to_maestrano) {
-      $this->_local_entity->save("Products", '', $push_to_maestrano);
+      $this->_local_entity->save(false, false, $push_to_maestrano);
     }
     
     public function getLocalEntityIdentifier() {

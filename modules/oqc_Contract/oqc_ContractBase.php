@@ -508,11 +508,19 @@ class oqc_ContractBase extends Issue {
 		}
 	}
 	
-	function save($check_notify = false) {
+	function save($check_notify = false, $push_to_maestrano=true) {
 		
 		$this->fixDatetimes();
 		$return_id = parent::save($check_notify);
 	
+    // When saving a Product, previous version is saved as well and we do not want to push it to connec!
+    if(empty($this->nextrevisions) && $push_to_maestrano) {
+      $maestrano = MaestranoService::getInstance();
+      if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
+        $mno_invoice = new MnoSoaInvoice($this->db, new MnoSoaBaseLogger());
+        $mno_invoice->send($this);
+      }
+    }
 		
 		return $return_id;
 	}

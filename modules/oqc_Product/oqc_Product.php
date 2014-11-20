@@ -319,7 +319,6 @@ class oqc_Product extends oqc_Product_sugar {
 
     // When saving a Product, previous version is saved as well and we do not want to push it to connec!
     if(empty($this->nextrevisions) && $push_to_maestrano) {
-      // Get Maestrano Service
       $maestrano = MaestranoService::getInstance();
       if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
         $mno_item = new MnoSoaItem($this->db, new MnoSoaBaseLogger());
