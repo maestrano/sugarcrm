@@ -107,6 +107,9 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
         $invoice_line['totalPrice']['netAmount'] = floatval($service->price * $service->quantity * (1.0 - $service->discount_value / 100.0));
         $invoice_line['totalPrice']['taxRate'] = floatval($tax_rate);
 
+        // Map invoice line tax rate
+        $invoice_line['taxCode']['id'] = $this->mapInvoiceLineTax($service->oqc_vat);
+
         $this->_invoice_lines[$invoice_line_mno_id] = $invoice_line;
       }
     }
@@ -296,6 +299,23 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
 
   public function getLocalEntityIdentifier() {
     return $this->_local_entity->id;
+  }
+
+  protected function mapInvoiceLineTax($oqc_vat) {
+    // SugarCRM stores only the tax rate against product, find first tax matching rate
+    $mno_tax = new MnoSoaTax($this->_db, $this->_log);
+    $taxes = $mno_tax->getAllTaxes();
+    foreach ($taxes as $tax) {
+      // Find first tax matching rate
+      $oqc_tax_rate = floatval($tax['rate']) / 100.0;
+      if($oqc_tax_rate == $oqc_vat) {
+        $mno_id = $this->getMnoIdByLocalIdName($tax['id'], 'TAX');
+        if(isset($mno_id)) {
+          return $mno_id->_id;
+        }
+      }
+    }
+    return null;
   }
 }
 
