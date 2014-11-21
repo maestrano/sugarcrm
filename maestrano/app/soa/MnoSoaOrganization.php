@@ -115,13 +115,13 @@ class MnoSoaOrganization extends MnoSoaBaseOrganization
     $this->_address->postalAddress->locality = $this->push_set_or_delete_value($this->_local_entity->billing_address_city);
     $this->_address->postalAddress->region = $this->push_set_or_delete_value($this->_local_entity->billing_address_state);
     $this->_address->postalAddress->postalCode = $this->push_set_or_delete_value($this->_local_entity->billing_address_postalcode);
-//$this->_address->postalAddress->country = $this->push_set_or_delete_value($this->_local_entity->billing_address_country);
+    $this->_address->postalAddress->country = $this->push_set_or_delete_value($this->_local_entity->billing_address_country);
 // SHIPPING ADDRESS -> STREET ADDRESS
     $this->_address->streetAddress->streetAddress = $this->push_set_or_delete_value($this->_local_entity->shipping_address_street);
     $this->_address->streetAddress->locality = $this->push_set_or_delete_value($this->_local_entity->shipping_address_city);
     $this->_address->streetAddress->region = $this->push_set_or_delete_value($this->_local_entity->shipping_address_state);
     $this->_address->streetAddress->postalCode = $this->push_set_or_delete_value($this->_local_entity->shipping_address_postalcode);
-//$this->_address->streetAddress->country = $this->push_set_or_delete_value($this->_local_entity->shipping_address_country);
+    $this->_address->streetAddress->country = $this->push_set_or_delete_value($this->_local_entity->shipping_address_country);
     $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
   }
 
@@ -132,13 +132,13 @@ class MnoSoaOrganization extends MnoSoaBaseOrganization
     $this->_local_entity->billing_address_city = $this->pull_set_or_delete_value($this->_address->postalAddress->locality);
     $this->_local_entity->billing_address_state = $this->pull_set_or_delete_value($this->_address->postalAddress->region);
     $this->_local_entity->billing_address_postalcode = $this->pull_set_or_delete_value($this->_address->postalAddress->postalCode);
-//$this->_local_entity->billing_address_country = $this->pull_set_or_delete_value($this->_address->postalAddress->country);
+    $this->_local_entity->billing_address_country = $this->pull_set_or_delete_value($this->_address->postalAddress->country);
 // STREET ADDRESS -> SHIPPING ADDRESS
     $this->_local_entity->shipping_address_street = $this->pull_set_or_delete_value($this->_address->streetAddress->streetAddress);
     $this->_local_entity->shipping_address_city = $this->pull_set_or_delete_value($this->_address->streetAddress->locality);
     $this->_local_entity->shipping_address_state = $this->pull_set_or_delete_value($this->_address->streetAddress->region);
     $this->_local_entity->shipping_address_postalcode = $this->pull_set_or_delete_value($this->_address->streetAddress->postalCode);
-//$this->_local_entity->shipping_address_country = $this->pull_set_or_delete_value($this->_address->streetAddress->country);
+    $this->_local_entity->shipping_address_country = $this->pull_set_or_delete_value($this->_address->streetAddress->country);
     $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
   }
 
