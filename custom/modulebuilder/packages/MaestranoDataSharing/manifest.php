@@ -60,9 +60,9 @@ $manifest = array (
   'icon' => '',
   'is_uninstallable' => true,
   'name' => 'MaestranoDataSharing',
-  'published_date' => '2014-11-20 06:06:33',
+  'published_date' => '2014-11-21 04:51:55',
   'type' => 'module',
-  'version' => 1416463593,
+  'version' => 1416545515,
   'remove_tables' => 'prompt',
 );
 
