@@ -7,7 +7,7 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
   protected $_local_entity_name = "INVOICE";
 
   protected function pushInvoice() {
-    $this->_log->debug("start pushInvoice " . json_encode($this->_local_entity->column_fields));
+    $this->_log->debug("start pushInvoice " . json_encode($this->_local_entity));
 
     $id = $this->getLocalEntityIdentifier();
     if (empty($id)) { return; }
@@ -50,16 +50,14 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
         $this->_status = 'PAID';
       } 
     }
-
     // Map Organization
     if(isset($this->_local_entity->company_id)) {
-      $mno_oragnization_id = $this->getMnoIdByLocalIdName($this->_local_entity->column_fields['account_id'], "ACCOUNTS");
+      $mno_oragnization_id = $this->getMnoIdByLocalIdName($this->_local_entity->company_id, "ACCOUNT");
       $this->_organization_id = $mno_oragnization_id->_id;
     }
-
     // Map Contact
     if(isset($this->_local_entity->clientcontact_id)) {
-      $mno_person_id = $this->getMnoIdByLocalIdName($this->_local_entity->column_fields['contact_id'], "CONTACTS");
+      $mno_person_id = $this->getMnoIdByLocalIdName($this->_local_entity->clientcontact_id, "CONTACT");
       $this->_person_id = $mno_person_id->_id;
     }
     
@@ -97,7 +95,7 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
         $tax_rate = $service->oqc_vat * 100.0;
         $invoice_line['id'] = $invoice_line_mno_id;
         $invoice_line['lineNumber'] = intval($service->position);
-        $invoice_line['description'] = intval($service->name);
+        $invoice_line['description'] = $service->name;
         $invoice_line['quantity'] = intval($service->quantity);
         $invoice_line['reductionPercent'] = floatval($service->discount_value);
 
@@ -212,7 +210,7 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
   }
 
   protected function saveLocalEntity($push_to_maestrano, $status) {
-    $this->_log->debug("start saveLocalEntity status=$status " . json_encode($this->_local_entity->column_fields));
+    $this->_log->debug("start saveLocalEntity status=$status " . json_encode($this->_local_entity));
     $this->_local_entity->save(false);
 
     // Map invoice ID
@@ -228,7 +226,9 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
   protected function mapInvoiceLines() {
     $local_invoice_id = $this->getLocalEntityIdentifier();
     $mno_entity_id = $this->_id;
+
     $servicesTableName = 'oqc_service';
+    $productsTableName = 'oqc_product';
 
     // Map invoice lines
     if(!empty($this->_invoice_lines)) {
@@ -236,12 +236,16 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
         // Map item
         if(!empty($line->item)) {
           $local_item_id = $this->getLocalIdByMnoIdName($line->item->id, "ITEMS");
+          $product_id = $local_item_id->_id;
+
+          $product = new oqc_Product();
+          $product->retrieve($product_id);
+          $name = $product->name;
+          $description = $product->description;
         }
 
-        $product_id = $local_item_id->_id;
         $unit_price = floatval($line->unitPrice->netAmount);
         $quantity = floatval($line->quantity);
-        $description = trim($line->description);
         $discount = floatval($line->reductionPercent);
         $line_number = intval($line->lineNumber);
 
@@ -261,12 +265,12 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
           $service = new oqc_Service();
           $service->retrieve($invoice_line_local_id);
 
-          // Udpate and save service
-          $service->description = (null == $description) ? '' : $description;
+          // Udpate service
           $service->product_id = (null == $product_id) ? '' : $product_id;
           $service->quantity = (null == $quantity) ? 1 : $quantity;
           $service->price = (null == $unit_price) ? 0.0 : $unit_price;
-          $service->name = (null == $description) ? '' : $description;
+          $service->name = (null == $name) ? '' : $name;
+          $service->description = (null == $description) ? '' : $description;
           $service->vat = (true == $taxable) ? true : false;
           $service->oqc_vat = $tax_rate_100;
           $service->zeitbezug = (null == $recurrence) ? 'once' : $recurrence;
@@ -278,10 +282,11 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
           $service->save();
         } else {
           // Create new service
-          $service = new oqc_Service($product_id, $unit_price, $quantity, $description, $description, $taxable, $recurrence, $unit, $discount, $discount_type, $line_number, $currency);
+          $service = new oqc_Service($product_id, $unit_price, $quantity, $name, $description, $taxable, $recurrence, $unit, $discount, $discount_type, $line_number, $currency);
           $service->oqc_vat = $tax_rate_100;
           $service->save();
           $this->_local_entity->$servicesTableName->add($service->id);
+          $this->_local_entity->$productsTableName->add($product_id);
           // Map invoice line ID
           $this->_mno_soa_db_interface->addIdMapEntry($service->id, "INVOICE_LINE", $mno_invoice_line_id, "INVOICE_LINE");
         }
