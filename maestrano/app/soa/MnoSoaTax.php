@@ -76,7 +76,7 @@ class MnoSoaTax extends MnoSoaBaseTax {
     return $this->_local_entity['taxid'];
   }
 
-  private function getAllTaxes() {
+  public function getAllTaxes() {
     $taxes = array();
     $query = "SELECT * from mno_taxes";
     $result = $this->_db->query($query);
@@ -86,10 +86,20 @@ class MnoSoaTax extends MnoSoaBaseTax {
     return $taxes;
   }
 
-  private function findTaxByLabel($tax_name) {
+  public function findTaxByLabel($tax_name) {
     $taxes = $this->getAllTaxes();
     foreach ($taxes as $tax) {
       if($tax['name'] == $tax_name) {
+        return $tax;
+      }
+    }
+    return null;
+  }
+
+  public function findTaxById($tax_id) {
+    $taxes = $this->getAllTaxes();
+    foreach ($taxes as $tax) {
+      if($tax['id'] == $tax_id) {
         return $tax;
       }
     }

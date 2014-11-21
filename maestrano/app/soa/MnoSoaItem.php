@@ -68,7 +68,15 @@ class MnoSoaItem extends MnoSoaBaseItem
         $this->pullStatus();
         $this->pullUnit();
         $this->pullSalePrice();
-        $this->pullPurchasePrice();
+
+        // Map sale tax rate
+        if(isset($this->_sale_tax_code)) {
+          $local_tax_id_map = $this->getLocalIdByMnoIdName($this->_sale_tax_code->id, "TAX_CODES");
+          $mno_tax = new MnoSoaTax($this->_db, $this->_log);
+          $mno_tax = $mno_tax->findTaxById($local_tax_id_map->_id);
+          $tax_rate100 = floatval($mno_tax['rate']) / 100.0;
+          $this->_local_entity->oqc_vat = "$tax_rate100";
+        }
 
         return $status;
       }
@@ -170,6 +178,22 @@ class MnoSoaItem extends MnoSoaBaseItem
       $this->_log->debug(__FUNCTION__ . " start");
       $this->_local_entity->cost = $this->pull_set_or_delete_value($this->_purchase_price);
       $this->_log->debug(__FUNCTION__ . " end");
+    }
+
+    protected function pushTax() {
+      // SugarCRM stores only the tax rate against product, find first tax matching rate
+      $mno_tax = new MnoSoaTax($this->_db, $this->_log);
+      $taxes = $mno_tax->getAllTaxes();
+      foreach ($taxes as $tax) {
+        // Find first tax matching rate
+        $oqc_tax_rate = floatval($tax['rate']) / 100.0;
+        if($oqc_tax_rate == $this->_local_entity->oqc_vat) {
+          $mno_id = $this->getMnoIdByLocalIdName($tax['id'], 'TAX');
+          if(isset($mno_id)) {
+            $this->_sale_tax_code = $mno_id->_id;
+          }
+        }
+      }
     }
     
     protected function pushEntity() {

@@ -107,6 +107,10 @@ class MnoSoaBaseItem extends MnoSoaBaseEntity
     protected function pullPurchasePrice() {
         throw new Exception('Function '. __FUNCTION__ . ' must be overriden in MnoItem class!');
     }
+
+    protected function pushTax() {
+        throw new Exception('Function '. __FUNCTION__ . ' must be overriden in MnoItem class!');
+    }
     
     protected function saveLocalEntity($push_to_maestrano, $status) {
     throw new Exception('Function '. __FUNCTION__ . ' must be overriden in MnoItem class!');
@@ -133,6 +137,7 @@ class MnoSoaBaseItem extends MnoSoaBaseEntity
         $this->pushUnit();
         $this->pushSalePrice();
         $this->pushPurchasePrice();
+        $this->pushTax();
         
         if ($this->_name != null) { $msg['item']->name = $this->_name; }
         if ($this->_code != null) { $msg['item']->code = $this->_code; }
