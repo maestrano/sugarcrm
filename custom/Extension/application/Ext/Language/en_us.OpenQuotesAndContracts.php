@@ -494,12 +494,29 @@ $app_list_strings["shipment_terms_list"] = array (
   'DDU' => 'DDU',
   'DDP' => 'DDP',
 );
-$app_list_strings["oqc_vat_list"] = array (
-  'default' => '19%',
-  '0.0' => '0%',
-  '0.05' => '5%',
-  '0.12' => '12%',
-);
+
+// Maestrano hook: Fetch taxes from Tax custom module
+// $app_list_strings["oqc_vat_list"] = array (
+//   'default' => '19%',
+//   '0.0' => '0%',
+//   '0.05' => '5%',
+//   '0.12' => '12%',
+// );
+$oqc_vat_list = function() {
+  $db = DBManagerFactory::getInstance();
+  $taxes = array();
+  $query = "SELECT * from mno_taxes";
+  $result = $db->query($query);
+
+  while($row = $db->fetchByAssoc($result)) {
+    $tax_name = $row['rate'] . "%";
+    $tax_rate = $row['rate'] / 100.0;
+    $taxes["$tax_rate"] = $tax_name;
+  }
+  return $taxes;
+};
+$app_list_strings["oqc_vat_list"] = $oqc_vat_list();
+
 $app_list_strings["oqc_templates_list"] = array (
   'Contract' => 'Contract',
   'Offering' => 'Quote',

@@ -301,7 +301,7 @@ class oqc_Product extends oqc_Product_sugar {
 	
 	}
 	
-	function save($check_notify = false, $save_old_bean = false) {
+	function save($check_notify = false, $save_old_bean = false, $push_to_maestrano=true) {
 		global $timedate;
 
 		if ($save_old_bean) {
@@ -311,15 +311,22 @@ class oqc_Product extends oqc_Product_sugar {
 		}
 		
 		// Bug 32581 - Make sure the currency_id is set to something
-        global $current_user, $app_list_strings;
+    global $current_user, $app_list_strings;
 
-      if ( empty($this->currency_id) )
-            $this->currency_id = -99;
-		
-		
+    if(empty($this->currency_id)) { $this->currency_id = -99; }
 		$this->fixDatetimes();
-		parent::save($check_notify);
-		
+		$result = parent::save($check_notify);
+
+    // When saving a Product, previous version is saved as well and we do not want to push it to connec!
+    if(empty($this->nextrevisions) && $push_to_maestrano) {
+      $maestrano = MaestranoService::getInstance();
+      if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
+        $mno_item = new MnoSoaItem($this->db, new MnoSoaBaseLogger());
+        $mno_item->send($this);
+      }
+    }
+
+    return $result;
 	}
 	
 	//2.1 avoid annoying depracated warnings and date conversion errors in sugarlog
