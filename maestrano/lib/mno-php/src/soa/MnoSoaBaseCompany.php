@@ -15,6 +15,7 @@ class MnoSoaBaseCompany extends MnoSoaBaseEntity
     protected $_delete_rest_entity_name = "company";
     protected $_delete_http_operation = "DELETE";    
     
+    protected $_id;
     protected $_name;
     protected $_currency;
     protected $_email;

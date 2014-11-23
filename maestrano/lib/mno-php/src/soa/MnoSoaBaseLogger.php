@@ -22,6 +22,10 @@ class MnoSoaBaseLogger {
     public function error($msg) {
         error_log($this->_app_prefix . " [error] " . $msg);
     }
+
+    public function fatal($msg) {
+        error_log($this->_app_prefix . " [fatal] " . $msg);
+    }
     
     public function info($msg){
         error_log($this->_app_prefix . " [info] " . $msg);
