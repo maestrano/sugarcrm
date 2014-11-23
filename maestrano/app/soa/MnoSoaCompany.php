@@ -47,7 +47,8 @@ class MnoSoaCompany extends MnoSoaBaseCompany
   }
 
   protected function saveLogo() {
-    $path = "upload/tmp_logo_company_upload/";
+    $this->_log->debug("saving company logo " . $this->_local_entity->logo->logo);
+    $path = "upload/";
     if(isset($this->_local_entity->logo->logo)) {
       // Save logo file locally
       $filename = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10) . '.jpg';
