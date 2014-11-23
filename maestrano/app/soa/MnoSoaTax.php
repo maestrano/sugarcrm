@@ -8,7 +8,13 @@ class MnoSoaTax extends MnoSoaBaseTax {
 
   protected function pushTax() {
     $this->_log->debug("start pushTax " . json_encode($this->_local_entity));
-    // DO NOT PUSH TAXES
+    $mno_id = $this->getMnoIdByLocalId($this->_local_entity->id);
+    if ($this->isValidIdentifier($mno_id)) {
+      $this->_id = $mno_id->_id;
+    }
+
+    $this->_name = $this->_local_entity->name;
+    $this->_rate = $this->_local_entity->rate;
     $this->_log->debug("after pushTax");
   }
 
@@ -73,7 +79,7 @@ class MnoSoaTax extends MnoSoaBaseTax {
   }
 
   public function getLocalEntityIdentifier() {
-    return $this->_local_entity['taxid'];
+    return $this->_local_entity->id;
   }
 
   public function getAllTaxes() {
