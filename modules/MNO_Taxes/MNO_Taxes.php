@@ -43,6 +43,20 @@ class MNO_Taxes extends MNO_Taxes_sugar {
 	function MNO_Taxes(){	
 		parent::MNO_Taxes_sugar();
 	}
+
+  function save($check_notify = false, $push_to_maestrano=true) {
+    $result = parent::save($check_notify);
+
+    if($push_to_maestrano) {
+      $maestrano = MaestranoService::getInstance();
+      if ($maestrano->isSoaEnabled() and $maestrano->getSoaUrl()) {
+        $mno_tax = new MnoSoaTax($this->db, new MnoSoaBaseLogger());
+        $mno_tax->send($this);
+      }
+    }
+
+    return $result;
+  }
 	
 }
 ?>
