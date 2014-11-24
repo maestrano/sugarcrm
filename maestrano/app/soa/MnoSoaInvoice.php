@@ -214,7 +214,7 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
 
   protected function saveLocalEntity($push_to_maestrano, $status) {
     $this->_log->debug("start saveLocalEntity status=$status " . json_encode($this->_local_entity));
-    $this->_local_entity->save(false);
+    $this->_local_entity->save(false, $push_to_maestrano);
 
     // Map invoice ID
     if ($status == constant('MnoSoaBaseEntity::STATUS_NEW_ID')) {
