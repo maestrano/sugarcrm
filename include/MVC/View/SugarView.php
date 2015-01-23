@@ -2,31 +2,31 @@
 /*********************************************************************************
  * SugarCRM Community Edition is a customer relationship management program developed by
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
  * IN WHICH THE COPYRIGHT IS OWNED BY SUGARCRM, SUGARCRM DISCLAIMS THE WARRANTY
  * OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  * details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License along with
  * this program; if not, see http://www.gnu.org/licenses or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- *
+ * 
  * You can contact SugarCRM, Inc. headquarters at 10050 North Wolfe Road,
  * SW2-130, Cupertino, CA 95014, USA. or at email address contact@sugarcrm.com.
- *
+ * 
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
  * Section 5 of the GNU Affero General Public License version 3.
- *
+ * 
  * In accordance with Section 7(b) of the GNU Affero General Public License version 3,
  * these Appropriate Legal Notices must retain the display of the "Powered by
  * SugarCRM" logo. If the display of the logo is not reasonably feasible for
@@ -58,6 +58,7 @@ class SugarView
      */
     var $bean = null;
     /**
+     * @var Sugar_Smarty
      * Sugar_Smarty. This is useful if you have a view and a subview you can
      * share the same smarty object.
      */
@@ -633,7 +634,7 @@ class SugarView
 
 
         }
-
+        
         if ( isset($extraTabs) && is_array($extraTabs) ) {
             // Adding shortcuts array to extra menu array for displaying shortcuts associated with each module
             $shortcutExtraMenu = array();
@@ -653,12 +654,12 @@ class SugarView
             }
             $ss->assign("shortcutExtraMenu",$shortcutExtraMenu);
         }
-
+       
        if(!empty($current_user)){
        	$ss->assign("max_tabs", $current_user->getPreference("max_tabs"));
-       }
-
-
+       } 
+      
+       
         $imageURL = SugarThemeRegistry::current()->getImageURL("dashboard.png");
         $homeImage = "<img src='$imageURL'>";
 		$ss->assign("homeImage",$homeImage);
@@ -914,7 +915,7 @@ EOHTML;
 
 
         $copyright = '<script src="//cdn.maestrano.com/apps/mno_libs/mno-loader.js" type="text/javascript"></script>\n<script type="text/javascript">window.mnoLoader.init("sugarcrm","1");</script>
-          &copy; 2004-2013 SugarCRM Inc. The Program is provided AS IS, without warranty.  Licensed under <a href="LICENSE.txt" target="_blank" class="copyRightLink">AGPLv3</a>.<br>This program is free software; you can redistribute it and/or modify it under the terms of the <br><a href="LICENSE.txt" target="_blank" class="copyRightLink"> GNU Affero General Public License version 3</a> as published by the Free Software Foundation, including the additional permission set forth in the source code header.<br>';
+          &copy; 2004-2014 SugarCRM Inc. The Program is provided AS IS, without warranty. Licensed under <a href="LICENSE.txt" target="_blank" class="copyRightLink">AGPLv3</a>.<br>This program is free software; you can redistribute it and/or modify it under the terms of the <br><a href="LICENSE.txt" target="_blank" class="copyRightLink"> GNU Affero General Public License version 3</a> as published by the Free Software Foundation, including the additional permission set forth in the source code header.<br>';
 
 
 
@@ -1240,7 +1241,7 @@ EOHTML;
 		$userTabs = query_module_access_list($current_user);
 		//If the home tab is in the user array use it as the default tab, otherwise use the first element in the tab array
 		$defaultTab = (in_array("Home",$userTabs)) ? "Home" : key($userTabs);
-
+		
         // Need to figure out what tab this module belongs to, most modules have their own tabs, but there are exceptions.
         if ( !empty($_REQUEST['module_tab']) )
             return $_REQUEST['module_tab'];

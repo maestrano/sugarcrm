@@ -48,8 +48,7 @@ class MnoSoaPerson extends MnoSoaBasePerson
     
     protected function pushName() {
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " start ");
-        //$hp = $this->mapSalutationToHonorificPrefix($this->_local_entity->salutation);
-        //$this->_name->honorificPrefix = $this->push_set_or_delete_value($hp);
+        $this->_name->title = $this->push_set_or_delete_value($this->_local_entity->salutation);
         $this->_name->givenNames = $this->push_set_or_delete_value($this->_local_entity->first_name);
         $this->_name->familyName = $this->push_set_or_delete_value($this->_local_entity->last_name);
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
@@ -59,8 +58,7 @@ class MnoSoaPerson extends MnoSoaBasePerson
     
     protected function pullName() {
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " start ");
-        //$hp = $this->mapHonorificPrefixToSalutation($this->_name->honorificPrefix);
-        //$this->_local_entity->salutation = $this->pull_set_or_delete_value($hp);
+        $this->_local_entity->salutation = $this->pull_set_or_delete_value($this->_name->title);
         $this->_local_entity->first_name = $this->pull_set_or_delete_value($this->_name->givenNames);
         $this->_local_entity->last_name = $this->pull_set_or_delete_value($this->_name->familyName);
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
@@ -89,15 +87,13 @@ class MnoSoaPerson extends MnoSoaBasePerson
         $this->_address->work->postalAddress->locality = $this->push_set_or_delete_value($this->_local_entity->primary_address_city);
         $this->_address->work->postalAddress->region = $this->push_set_or_delete_value($this->_local_entity->primary_address_state);
         $this->_address->work->postalAddress->postalCode = $this->push_set_or_delete_value($this->_local_entity->primary_address_postalcode);
-        //$country_code = $this->mapCountryToISO3166($this->_local_entity->primary_address_country);
-        //$this->_address->work->postalAddress->country = strtoupper($this->push_set_or_delete_value($country_code));
+        $this->_address->work->postalAddress->country = $this->push_set_or_delete_value($this->_local_entity->primary_address_country);
         // OTHER ADDRESS -> POSTAL ADDRESS #2
         $this->_address->work->postalAddress2->streetAddress = $this->push_set_or_delete_value($this->_local_entity->alt_address_street);
         $this->_address->work->postalAddress2->locality = $this->push_set_or_delete_value($this->_local_entity->alt_address_city);
         $this->_address->work->postalAddress2->region = $this->push_set_or_delete_value($this->_local_entity->alt_address_state);
         $this->_address->work->postalAddress2->postalCode = $this->push_set_or_delete_value($this->_local_entity->alt_address_postalcode);
-        //$country_code = $this->mapCountryToISO3166($this->_local_entity->alt_address_country);
-        //$this->_address->work->postalAddress2->country = strtoupper($this->push_set_or_delete_value($country_code));
+        $this->_address->work->postalAddress2->country = $this->push_set_or_delete_value($this->_local_entity->alt_address_country);
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
     }
     
@@ -108,22 +104,20 @@ class MnoSoaPerson extends MnoSoaBasePerson
         $this->_local_entity->primary_address_city = $this->pull_set_or_delete_value($this->_address->work->postalAddress->locality);
         $this->_local_entity->primary_address_state = $this->pull_set_or_delete_value($this->_address->work->postalAddress->region);
         $this->_local_entity->primary_address_postalcode = $this->pull_set_or_delete_value($this->_address->work->postalAddress->postalCode);
-        //$country = $this->mapISO3166ToCountry($this->_address->work->postalAddress->country);
-        //$this->_local_entity->primary_address_country = $this->pull_set_or_delete_value($country);
+        $this->_local_entity->primary_address_country = $this->pull_set_or_delete_value($this->_address->work->postalAddress->country);
         // POSTAL ADDRESS #2 -> OTHER ADDRESS
         $this->_local_entity->alt_address_street = $this->pull_set_or_delete_value($this->_address->work->postalAddress2->streetAddress);
         $this->_local_entity->alt_address_city = $this->pull_set_or_delete_value($this->_address->work->postalAddress2->locality);
         $this->_local_entity->alt_address_state = $this->pull_set_or_delete_value($this->_address->work->postalAddress2->region);
         $this->_local_entity->alt_address_postalcode = $this->pull_set_or_delete_value($this->_address->work->postalAddress2->postalCode);
-        //$country = $this->mapISO3166ToCountry($this->_address->work->postalAddress2->country);
-        //$this->_local_entity->alt_address_country = $this->pull_set_or_delete_value($country);
+        $this->_local_entity->alt_address_country = $this->pull_set_or_delete_value($this->_address->work->postalAddress2->country);
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
     }
     
     protected function pushEmails() {
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " start ");
         $this->_email->emailAddress = $this->push_set_or_delete_value($this->_local_entity->email1);
-	$this->_email->emailAddress2 = $this->push_set_or_delete_value($this->_local_entity->email2);
+        $this->_email->emailAddress2 = $this->push_set_or_delete_value($this->_local_entity->email2);
         $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " end ");
     }
     
