@@ -70,17 +70,29 @@ class SugarWebServiceImplv4 extends SugarWebServiceImplv3_1 {
         $error = new SoapError();
         $user = new User();
         $success = false;
+        
         //rrs
+        $GLOBALS['log']->info("During SugarWebServiceImpl->login: Retrieving System Settings");
         $system_config = new Administration();
         $system_config->retrieveSettings('system');
         $authController = new AuthenticationController();
+        $GLOBALS['log']->info("During SugarWebServiceImpl->login: Retrieved System Settings");
+        
         //rrs
         if(!empty($user_auth['encryption']) && $user_auth['encryption'] === 'PLAIN' && $authController->authController->userAuthenticateClass != "LDAPAuthenticateUser")
         {
+            $GLOBALS['log']->info("During SugarWebServiceImpl->login: Plain login. Encrypting password");
             $user_auth['password'] = md5($user_auth['password']);
         }
+        
+        $GLOBALS['log']->info("During SugarWebServiceImpl->login: Authenticating webservice user " . $user_auth['user_name']);
         $isLoginSuccess = $authController->login($user_auth['user_name'], $user_auth['password'], array('passwordEncrypted' => true));
+        $GLOBALS['log']->info("During SugarWebServiceImpl->login: isLoginSuccess = " . $isLoginSuccess);
+        
         $usr_id=$user->retrieve_user_id($user_auth['user_name']);
+        
+        $GLOBALS['log']->info("During SugarWebServiceImpl->login: retrieve_user_id = " . $usr_id);
+        
         if($usr_id)
             $user->retrieve($usr_id);
 

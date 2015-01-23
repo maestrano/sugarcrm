@@ -368,6 +368,7 @@ class User extends Person {
 	    $category = 'global'
 	    )
 	{
+      $GLOBALS['log']->info('Begin User->loadPreferences');
 	    // for BC
 	    if ( func_num_args() > 1 ) {
 	        $user = func_get_arg(1);
@@ -375,8 +376,9 @@ class User extends Person {
 	    }
 	    else
 	        $user = $this;
-
-        return $user->_userPreferenceFocus->loadPreferences($category);
+      
+      $GLOBALS['log']->info('During User->loadPreferences: calling UserPreference->loadPreferences');
+      return $user->_userPreferenceFocus->loadPreferences($category);
 	}
 
 	/**

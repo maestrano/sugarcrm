@@ -77,15 +77,24 @@ class SugarAuthenticate{
 	function loginAuthenticate($username, $password, $fallback=false, $PARAMS = array ()){
 		global $mod_strings;
 		unset($_SESSION['login_error']);
+    
+    $GLOBALS['log']->info("Begin SugarAuthenticate->loginAuthenticate");
+    
 		$usr= new user();
 		$usr_id=$usr->retrieve_user_id($username);
+    $GLOBALS['log']->info("During SugarAuthenticate->loginAuthenticate: Retrieved usr_id " . $usr_id);
 		$usr->retrieve($usr_id);
+    $GLOBALS['log']->info("During SugarAuthenticate->loginAuthenticate: Retrieved usr object");
+    
 		$_SESSION['login_error']='';
 		$_SESSION['waiting_error']='';
 		$_SESSION['hasExpiredPassword']='0';
+    
 		if ($this->userAuthenticate->loadUserOnLogin($username, $password, $fallback, $PARAMS)) {
-			require_once('modules/Users/password_utils.php');
+			$GLOBALS['log']->info("During SugarAuthenticate->loginAuthenticate: loadUserOnLogin succesful");
+      require_once('modules/Users/password_utils.php');
 			if(hasPasswordExpired($username)) {
+        $GLOBALS['log']->info("During SugarAuthenticate->loginAuthenticate: User password has expired");
 				$_SESSION['hasExpiredPassword'] = '1';
 			}
 			// now that user is authenticated, reset loginfailed
@@ -98,6 +107,7 @@ class SugarAuthenticate{
 		}
 		else
 		{
+      $GLOBALS['log']->info("During SugarAuthenticate->loginAuthenticate: loadUserOnLogin failed");
 			if(!empty($usr_id) && $res['lockoutexpiration'] > 0){
 				if (($logout=$usr->getPreference('loginfailed'))=='')
 	        		$usr->setPreference('loginfailed','1');
@@ -106,6 +116,7 @@ class SugarAuthenticate{
 	    		$usr->savePreferencesToDB();
     		}
 		}
+    
 		if(strtolower(get_class($this)) != 'sugarauthenticate'){
 			$sa = new SugarAuthenticate();
 			$error = (!empty($_SESSION['login_error']))?$_SESSION['login_error']:'';
