@@ -155,6 +155,7 @@ $app_list_strings = array (
     'Analyst' => 'Analyst',
     'Competitor' => 'Competitor',
     'Customer' => 'Customer',
+    'Supplier' => 'Supplier',
     'Integrator' => 'Integrator',
     'Investor' => 'Investor',
     'Partner' => 'Partner',
