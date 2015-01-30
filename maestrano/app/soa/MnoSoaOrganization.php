@@ -184,11 +184,15 @@ class MnoSoaOrganization extends MnoSoaBaseOrganization
   }
 
   protected function pushEntity() {
-// DO NOTHING
+    $account_type = $this->push_set_or_delete_value($this->_local_entity->account_type);
+    if(isset($account_type) && $account_type == 'Customer') { $this->_entity = array('customer'=>true); }
+    if(isset($account_type) && $account_type == 'Supplier') { $this->_entity = array('supplier'=>true); }
   }
 
   protected function pullEntity() {
-// DO NOTHING
+    $entity_type = $this->pull_set_or_delete_value($this->_entity);
+    if(isset($entity_type) && $entity_type['customer']) { $this->_local_entity->account_type = 'Customer'; }
+    if(isset($entity_type) && $entity_type['supplier']) { $this->_local_entity->account_type = 'Supplier'; }
   }
 
   protected function saveLocalEntity($push_to_maestrano) {

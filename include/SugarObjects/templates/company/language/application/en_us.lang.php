@@ -49,6 +49,7 @@ if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
     'Analyst' => 'Analyst',
     'Competitor' => 'Competitor',
     'Customer' => 'Customer',
+    'Supplier' => 'Supplier',
     'Integrator' => 'Integrator',
     'Investor' => 'Investor',
     'Partner' => 'Partner',
