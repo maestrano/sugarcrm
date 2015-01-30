@@ -191,8 +191,8 @@ class MnoSoaOrganization extends MnoSoaBaseOrganization
 
   protected function pullEntity() {
     $entity_type = $this->pull_set_or_delete_value($this->_entity);
-    if(isset($entity_type) && $entity_type['customer']) { $this->_local_entity->account_type = 'Customer'; }
-    if(isset($entity_type) && $entity_type['supplier']) { $this->_local_entity->account_type = 'Supplier'; }
+    if(isset($entity_type) && isset($entity_type->customer) && $entity_type->customer == true) { $this->_local_entity->account_type = 'Customer'; }
+    if(isset($entity_type) && isset($entity_type->supplier) && $entity_type->supplier == true) { $this->_local_entity->account_type = 'Supplier'; }
   }
 
   protected function saveLocalEntity($push_to_maestrano) {
