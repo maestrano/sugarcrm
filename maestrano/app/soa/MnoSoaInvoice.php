@@ -96,7 +96,7 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
         $tax_rate = $service->oqc_vat * 100.0;
         $invoice_line['id'] = $invoice_line_mno_id;
         $invoice_line['lineNumber'] = intval($service->position);
-        $invoice_line['description'] = $service->name;
+        $invoice_line['description'] = $service->description;
         $invoice_line['quantity'] = intval($service->quantity);
         $invoice_line['reductionPercent'] = floatval($service->discount_value);
 
@@ -243,6 +243,8 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
       $processed_lines_local_ids = array();
 
       foreach($this->_invoice_lines as $line_id => $line) {
+        $description = $line->description;
+
         // Map item
         if(!empty($line->item)) {
           $local_item_id = $this->getLocalIdByMnoIdName($line->item->id, "ITEMS");
@@ -251,7 +253,9 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
           $product = new oqc_Product();
           $product->retrieve($product_id);
           $name = $product->name;
-          $description = $product->description;
+        } else {
+          $product_id = null;
+          $name = null;
         }
 
         $unit_price = floatval($line->unitPrice->netAmount);
