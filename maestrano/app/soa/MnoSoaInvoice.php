@@ -33,6 +33,7 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
     $this->_type = 'CUSTOMER';
     $this->_title = $this->push_set_or_delete_value($this->_local_entity->name);
     $this->_transaction_number = $this->push_set_or_delete_value($this->_local_entity->svnumber);
+    $this->_public_note = $this->push_set_or_delete_value($this->_local_entity->description);
 
     $this->_transaction_date = strtotime($this->push_set_or_delete_value($this->_local_entity->startdate));
     $this->_due_date = strtotime($this->push_set_or_delete_value($this->_local_entity->enddate));
@@ -152,6 +153,7 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
     // Map invoice attributes
     $this->_local_entity->name = $this->pull_set_or_delete_value($this->_title);
     $this->_local_entity->svnumber = $this->pull_set_or_delete_value($this->_transaction_number);
+    $this->_local_entity->description = $this->pull_set_or_delete_value($this->_public_note);
     if($this->_transaction_date) { $this->_local_entity->startdate = date('Y-m-d', $this->_transaction_date); }
     if($this->_due_date) { $this->_local_entity->enddate = date('Y-m-d', $this->_due_date); }
     
@@ -233,8 +235,13 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
     $servicesTableName = 'oqc_service';
     $productsTableName = 'oqc_product';
 
+    $local_invoice_lines = $this->_local_entity->$servicesTableName->get();
+    $this->_log->debug("existing invoice lines ids: " . json_encode($local_invoice_lines));
+
     // Map invoice lines
     if(!empty($this->_invoice_lines)) {
+      $processed_lines_local_ids = array();
+
       foreach($this->_invoice_lines as $line_id => $line) {
         // Map item
         if(!empty($line->item)) {
@@ -292,6 +299,19 @@ class MnoSoaInvoice extends MnoSoaBaseInvoice {
           $this->_local_entity->$productsTableName->add($product_id);
           // Map invoice line ID
           $this->_mno_soa_db_interface->addIdMapEntry($service->id, "INVOICE_LINE", $mno_invoice_line_id, "INVOICE_LINE");
+        }
+
+        // Keep track of received line IDs to remove missing ones
+        array_push($processed_lines_local_ids, $service->id);
+      }
+
+      // Delete local invoice lines that have been removed
+      $this->_log->debug("Processed invoice lines " . json_encode($processed_lines_local_ids));
+      foreach ($local_invoice_lines as $local_invoice_line_id) {
+        if(!in_array($local_invoice_line_id, $processed_lines_local_ids)) {
+          $this->_log->debug("Deleting invoice line " . json_encode($local_invoice_line_id));
+          $this->_local_entity->$servicesTableName->delete($local_invoice_id, $local_invoice_line_id);
+          $this->_mno_soa_db_interface->deleteIdMapEntry($local_invoice_line_id, 'INVOICE_LINE');
         }
       }
     }

@@ -133,6 +133,21 @@ class MnoSoaDB extends MnoSoaBaseDB {
     }
   }
 
+  public function hardDeleteIdMapEntry($localId, $localEntityName) {
+    $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " start");
+    // Hard delete record
+    $query = "DELETE FROM mno_id_map WHERE app_entity_id='" . $localId . "' and app_entity_name='" . strtoupper($localEntityName) . "'";
+    $result = $this->_db->query($query);
+
+    if ($result) {
+      $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " return true");
+      return true;
+    } else {
+      $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " return false");
+      return false;
+    }
+  }
+
   public function relinkIdMapEntry($new_local_id, $previous_local_id, $local_entity_name) {
     $this->_log->debug(__CLASS__ . ' ' . __FUNCTION__ . " start");
     $query = "UPDATE mno_id_map SET app_entity_id=" .
