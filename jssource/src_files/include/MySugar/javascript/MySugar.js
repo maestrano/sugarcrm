@@ -326,7 +326,7 @@ SUGAR.mySugar = function() {
 			}*/
 			ajaxStatus.showStatus(SUGAR.language.get('app_strings', 'LBL_ADDING_DASHLET'));
 			var success = function(data) {
-
+        data.responseText = data.responseText.replace(/\n/g,'').replace(/ /g,'');
 				colZero = document.getElementById('col_'+activeTab+'_0');
 				newDashlet = document.createElement('li'); // build the list item
 				newDashlet.id = 'dashlet_' + data.responseText;
