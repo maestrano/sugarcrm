@@ -4627,6 +4627,7 @@ CREATE TABLE `outbound_email` (
 
 LOCK TABLES `outbound_email` WRITE;
 /*!40000 ALTER TABLE `outbound_email` DISABLE KEYS */;
+INSERT INTO `outbound_email` VALUES ('66cf0c71-483f-2ab1-d0d9-55c0710b8899','system','system','1','SMTP','other','localhost',25,'','',0,0),('66d7f3c6-2e2c-342c-1f58-55c071924e89','system','system','1','SMTP','other','',25,'','',1,0);
 /*!40000 ALTER TABLE `outbound_email` ENABLE KEYS */;
 UNLOCK TABLES;
 
