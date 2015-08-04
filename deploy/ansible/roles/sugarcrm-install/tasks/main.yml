@@ -95,7 +95,7 @@
 
 - name: SugarCRM | Configuration file config.php
   template: 
-    src: sugacrm-config.php
+    src: sugarcrm-config.php
     dest: "{{ sugarcrm_root_path }}/config.php"
     owner: root
     mode: 755
