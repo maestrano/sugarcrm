@@ -19,30 +19,21 @@
   tags:
     - configuration
 
-- name: SugarCRM | Create apache database user
+- name: SugarCRM | Create SugarCRM database
+  mysql_db:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    db: "{{ sugarcrm_db_name }}"
+    state: present
+
+- name: SugarCRM | Create SugarCRM database user
   mysql_user:
-    name: "www-data"
-    password: ""
-    # priv: "{{ sugarcrm_db_name }}.*:ALL,GRANT"
+    name: "{{ sugarcrm_db_user }}"
+    password: "{{ sugarcrm_db_password }}"
+    priv: "{{ sugarcrm_db_name }}.*:ALL,GRANT"
     state: present
     login_user: root
     login_password: "{{ mysql_root_password }}"
-
-# - name: SugarCRM | Create SugarCRM database
-#   mysql_db:
-#     login_user: root
-#     login_password: "{{ mysql_root_password }}"
-#     db: "{{ sugarcrm_db_name }}"
-#     state: present
-
-# - name: SugarCRM | Create SugarCRM database user
-#   mysql_user:
-#     name: "{{ sugarcrm_db_user }}"
-#     password: "{{ sugarcrm_db_password }}"
-#     priv: "{{ sugarcrm_db_name }}.*:ALL,GRANT"
-#     state: present
-#     login_user: root
-#     login_password: "{{ mysql_root_password }}"
 
 - name: SugarCRM | Download application from Github
   sudo: false
@@ -56,8 +47,6 @@
     force: yes
   tags:
     - update
-    # - configuration
-# TO REMOVE
 
 - name: SugarCRM | Current commit hash
   shell: 'git log -n 1 --pretty=format:"%H" > {{ sugarcrm_root_path }}/.git-version'
@@ -101,88 +90,58 @@
     group: www-data
     state: directory
     recurse: yes
-  # tags:
-    # - configuration
+  tags:
+    - configuration
 
-- name: SugarCRM | Give write permissions to install directories
-  file:
-    path: "{{ sugarcrm_root_path }}/{{ item }}"
+- name: SugarCRM | Configuration file config.php
+  template: 
+    src: sugacrm-config.php
+    dest: "{{ sugarcrm_root_path }}/config.php"
+    owner: root
+    mode: 755
+
+- name: SugarCRM | Base schema base_schema.sql
+  template: 
+    src: sugarcrm-base-schema.sql
+    dest: "{{ sugarcrm_root_path }}/maestrano/app/db/base_schema.sql"
     owner: www-data
     group: www-data
-    mode: 0775
-    state: directory
-    recurse: yes
-  with_items:
-    - cache
-    - custom
-    - data
-    - modules
+    mode: 0755
 
-- name: SugarCRM | Give write permissions to install files
-  file:
-    path: "{{ sugarcrm_root_path }}/{{ item }}"
+- name: SugarCRM | Apply Maestrano patch
+  shell: "mysql {{ sugarcrm_db_name }} -u{{sugarcrm_db_user}} -p{{sugarcrm_db_password}} < maestrano/app/db/{{ item }}"
+  args:
+    chdir: "{{ sugarcrm_root_path }}"
+  with_items:
+    - base_schema.sql
+    - 1_add_mno_uid_field.sql
+    - 2_add_mno_id_map.sql
+
+- name: SugarCRM | Configuration file maestrano.json
+  template: 
+    src: sugarcrm-maestrano.json
+    dest: "{{ sugarcrm_root_path }}/maestrano.json"
     owner: www-data
     group: www-data
-    mode: 0664
-  with_items:
-    - config.php
-    - config_override.php
-    - sugarcrm.log
-
-# - name: vTiger | Configuration file config.php
-#   template: 
-#     src: vtiger-config.inc.php
-#     dest: "{{ vtiger_root_path }}/config.inc.php"
-#     owner: root
-#     mode: 755
-
-# - name: vTiger | Configuration file app_setup.php
-#   copy: 
-#     src: vtiger-app_setup.php
-#     dest: "{{ vtiger_root_path }}/app_setup.php"
-#     owner: root
-#     mode: 755
-
-# - name: vTiger | Configuration file user_privileges
-#   copy: 
-#     src: "{{ item }}"
-#     dest: "{{ vtiger_root_path }}/user_privileges/{{ item }}"
-#     owner: root
-#     mode: 755
-#   with_items:
-#     - sharing_privileges_1.php
-#     - user_privileges_1.php
-
-# - name: vTiger | Configuration file maestrano.json
-#   template: 
-#     src: vtiger-maestrano.json
-#     dest: "{{ vtiger_root_path }}/maestrano.json"
-#     owner: www-data
-#     group: www-data
-#     mode: 777
-#   tags:
-#     - configuration
+    mode: 777
+  tags:
+    - configuration
 
 # - name: vTiger | Setup Application
 #   shell: "php {{ vtiger_root_path }}/app_setup.php"
 #   args:
 #     chdir: "{{ vtiger_root_path }}"
 
-# - name: vTiger | Apply Maestrano patch
-#   shell: "mysql {{ vtiger_db_name }} -u{{vtiger_db_user}} -p{{vtiger_db_password}} < maestrano/app/db/1_add_mno_uid_field.sql"
-#   args:
-#     chdir: "{{ vtiger_root_path }}"
-
-# - name: vTiger | Set log files permissions
-#   file:
-#     path: /var/log/apache2
-#     mode: 0755
-#     owner: www-data
-#     group: www-data
-#     state: directory
-#     recurse: yes
-#   tags:
-#     - configuration
+- name: SugarCRM | Set log files permissions
+  file:
+    path: /var/log/apache2
+    mode: 0755
+    owner: www-data
+    group: www-data
+    state: directory
+    recurse: yes
+  tags:
+    - configuration
 
 # - name: vTiger | Import Connec! data
 #   shell: "(nohup php initialize.php 1>/var/log/apache2/vtigercrm_initialize.log 2>&1) &"
