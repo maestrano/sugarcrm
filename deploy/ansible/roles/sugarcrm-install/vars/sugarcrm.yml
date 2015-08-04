@@ -1,0 +1,13 @@
+# SugarCRM installation
+sugarcrm_db_user: sugarcrm
+sugarcrm_db_password: sugarcrmpassword
+sugarcrm_db_name: sugarcrm
+sugarcrm_root_path: /var/lib/sugarcrm/webapp
+
+# SugarCRM default configuration
+sso_enabled: "false"
+connec_enabled: "false"
+maestrano_environment: "production"
+server_hostname: "server_hostname"
+api_key: "api_key"
+api_secret: "api_secret"
