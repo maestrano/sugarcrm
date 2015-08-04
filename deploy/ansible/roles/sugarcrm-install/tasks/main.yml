@@ -60,12 +60,12 @@
   tags:
     - update
 
-# - name: Ansible | Update scripts
-#   copy:
-#     src: "{{ sugarcrm_root_path }}/deploy/ansible"
-#     dest: /etc/
-#   tags:
-#     - update
+- name: Ansible | Update scripts
+  copy:
+    src: "{{ sugarcrm_root_path }}/deploy/ansible"
+    dest: /etc/
+  tags:
+    - update
 
 - name: SugarCRM | Configure Apache virtual host
   template: 
@@ -98,7 +98,7 @@
     src: sugarcrm-config.php
     dest: "{{ sugarcrm_root_path }}/config.php"
     owner: root
-    mode: 755
+    mode: 0755
 
 - name: SugarCRM | Base schema base_schema.sql
   template: 
@@ -126,11 +126,6 @@
     mode: 777
   tags:
     - configuration
-
-# - name: vTiger | Setup Application
-#   shell: "php {{ vtiger_root_path }}/app_setup.php"
-#   args:
-#     chdir: "{{ vtiger_root_path }}"
 
 - name: SugarCRM | Set log files permissions
   file:
