@@ -7,6 +7,24 @@
     - configuration
     - update
 
+- include_vars: 'uat.yml'
+  when: maestrano_environment == 'uat'
+  tags:
+    - configuration
+    - update
+
+- include_vars: 'production.yml'
+  when: maestrano_environment == 'production'
+  tags:
+    - configuration
+    - update
+
+- include_vars: 'local.yml'
+  when: maestrano_environment == 'local'
+  tags:
+    - configuration
+    - update
+
 - name: General | Install Application packages
   apt: "name={{ item }} state=present"
   with_items:
@@ -99,6 +117,21 @@
     dest: "{{ sugarcrm_root_path }}/config.php"
     owner: root
     mode: 0755
+  tags:
+    - configuration
+
+- name: Maestrano | Push specific configuration files
+  template: 
+    src: 'config-{{ item }}'
+    dest: "{{ sugarcrm_root_path }}/maestrano/app/config/{{ item }}"
+    owner: www-data
+    group: www-data
+    mode: 0755
+  with_items:
+    - 1_app.php
+    - 2_maestrano.php
+  tags:
+    - configuration
 
 - name: SugarCRM | Base schema base_schema.sql
   template: 
@@ -138,10 +171,10 @@
   tags:
     - configuration
 
-# - name: vTiger | Import Connec! data
-#   shell: "(nohup php initialize.php 1>/var/log/apache2/vtigercrm_initialize.log 2>&1) &"
-#   args:
-#     chdir: "{{ vtiger_root_path }}/maestrano/scripts"
-#   sudo_user: www-data
-#   tags:
-#     - configuration
+- name: Sugar | Import Connec! data
+  shell: "(nohup php initialize.php 1>/var/log/apache2/sugarcrm_initialize.log 2>&1) &"
+  args:
+    chdir: "{{ sugarcrm_root_path }}/maestrano/data"
+  sudo_user: www-data
+  tags:
+    - configuration

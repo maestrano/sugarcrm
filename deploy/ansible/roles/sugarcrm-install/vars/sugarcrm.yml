@@ -11,3 +11,9 @@ maestrano_environment: "production"
 server_hostname: "server_hostname"
 api_key: "api_key"
 api_secret: "api_secret"
+
+# Mno configuration
+app_name: 'sugarcrm'
+sso_init_path: '/maestrano/auth/saml/index.php'
+sso_consume_path: '/maestrano/auth/saml/consume.php'
+soa_init_path: '/maestrano/data/initialize.php'
