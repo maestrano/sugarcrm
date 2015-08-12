@@ -58,7 +58,6 @@ class AuthenticationController
 	 */
 	public function __construct($type = null)
 	{
-      $GLOBALS['log']->info("Begin AuthenticationController->__constructor(".$type.")");
         $this->authController = $this->getAuthController($type);
 	}
 
@@ -92,9 +91,7 @@ class AuthenticationController
             && (is_subclass_of($type, 'SAMLAuthenticate') || 'SAMLAuthenticate' == $type)) {
             $type = 'SugarAuthenticate';
         }
-        
-        $GLOBALS['log']->info("During AuthenticationController->getAuthController: type is " . $type);
-        
+
         return new $type();
     }
 
@@ -123,7 +120,6 @@ class AuthenticationController
 	 */
 	public function login($username, $password, $PARAMS = array())
 	{
-    $GLOBALS['log']->info("Begin AuthenticationController->login");
 		//kbrill bug #13225
 		$_SESSION['loginAttempts'] = (isset($_SESSION['loginAttempts']))? $_SESSION['loginAttempts'] + 1: 1;
 		unset($GLOBALS['login_error']);
@@ -133,14 +129,11 @@ class AuthenticationController
 
 		$this->loginSuccess = $this->authController->loginAuthenticate($username, $password, false, $PARAMS);
 		$this->loggedIn = true;
-    $GLOBALS['log']->info("During AuthenticationController->login: this->loginSuccess =" . $this->loginSuccess);
-    
+
 		if($this->loginSuccess){
 			//Ensure the user is authorized
-      $GLOBALS['log']->info("During AuthenticationController->login: calling checkAuthUserStatus");
 			checkAuthUserStatus();
-      
-      $GLOBALS['log']->info("During AuthenticationController->login: calling loginLicense");
+
 			loginLicense();
 			if(!empty($GLOBALS['login_error'])){
 				unset($_SESSION['authenticated_user_id']);
@@ -148,41 +141,29 @@ class AuthenticationController
 				$this->loginSuccess = false;
 				return false;
 			}
-      
-      $GLOBALS['log']->info("During AuthenticationController->login: login passed");
 
 			//call business logic hook
-			if(isset($GLOBALS['current_user'])) {
-			  $GLOBALS['log']->info("During AuthenticationController->login: calling after_login hook");
-        $GLOBALS['current_user']->call_custom_logic('after_login');
-			}
+			if(isset($GLOBALS['current_user']))
+				$GLOBALS['current_user']->call_custom_logic('after_login');
 
 			// Check for running Admin Wizard
-      $GLOBALS['log']->info("During AuthenticationController->login: retrieving Administration Settings");
 			$config = new Administration();
 			$config->retrieveSettings();
-      $GLOBALS['log']->debug("During AuthenticationController->login: Administration Settings are: " . json_encode($config->settings));
-      
-		  if ( !isset($PARAMS['passwordEncrypted']) && is_admin($GLOBALS['current_user']) && empty($config->settings['system_adminwizard']) && $_REQUEST['action'] != 'AdminWizard') {
-				$GLOBALS['log']->info("During AuthenticationController->login: need to run AdminWizard");
-        $GLOBALS['module'] = 'Configurator';
+		    if ( is_admin($GLOBALS['current_user']) && empty($config->settings['system_adminwizard']) && $_REQUEST['action'] != 'AdminWizard' ) {
+				$GLOBALS['module'] = 'Configurator';
 				$GLOBALS['action'] = 'AdminWizard';
 				ob_clean();
 				header("Location: index.php?module=Configurator&action=AdminWizard");
 				sugar_cleanup(true);
 			}
-      
-      $GLOBALS['log']->debug("During AuthenticationController->login: retrieving 'ut' preference");
+
 			$ut = $GLOBALS['current_user']->getPreference('ut');
 			$checkTimeZone = true;
 			if (is_array($PARAMS) && !empty($PARAMS) && isset($PARAMS['passwordEncrypted'])) {
-        $GLOBALS['log']->info("During AuthenticationController->login: no need to check timezone as it is a webservice call");
 				$checkTimeZone = false;
 			} // if
-			
-      if(empty($ut) && $checkTimeZone && $_REQUEST['action'] != 'SetTimezone' && $_REQUEST['action'] != 'SaveTimezone' ) {
-				$GLOBALS['log']->info("During AuthenticationController->login: will force page to check timezone");
-        $GLOBALS['module'] = 'Users';
+			if(empty($ut) && $checkTimeZone && $_REQUEST['action'] != 'SetTimezone' && $_REQUEST['action'] != 'SaveTimezone' ) {
+				$GLOBALS['module'] = 'Users';
 				$GLOBALS['action'] = 'Wizard';
 				ob_clean();
 				header("Location: index.php?module=Users&action=Wizard");
@@ -195,9 +176,8 @@ class AuthenticationController
 			$GLOBALS['log']->fatal('FAILED LOGIN:attempts[' .$_SESSION['loginAttempts'] .'] - '. $username);
 		}
 		// if password has expired, set a session variable
-    $GLOBALS['log']->info("During AuthenticationController->login: returning " . $this->loginSuccess);
-		
-    return $this->loginSuccess;
+
+		return $this->loginSuccess;
 	}
 
 	/**
