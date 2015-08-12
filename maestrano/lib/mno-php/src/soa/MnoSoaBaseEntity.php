@@ -147,7 +147,7 @@ class MnoSoaBaseEntity
       curl_setopt($curl, CURLOPT_HEADER, false);
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode($GLOBALS['api_key'].":".$GLOBALS['api_secret']), "Content-type: application/json"));
-      curl_setopt($curl, CURLOPT_TIMEOUT, '60');
+      curl_setopt($curl, CURLOPT_TIMEOUT, '600');
       
       $this->_log->debug(__FUNCTION__ . " before switch");
       
