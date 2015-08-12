@@ -91,6 +91,8 @@
     dest: /etc/apache2/sites-available/sugarcrm.conf
     owner: root
     mode: 755
+  tags:
+    - configuration
 
 - name: SugarCRM | Enable Apache virtual host 
   file: src=/etc/apache2/sites-available/sugarcrm.conf dest=/etc/apache2/sites-enabled/sugarcrm.conf state=link
