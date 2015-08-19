@@ -4,7 +4,11 @@
 // SOA Configuration
 //------------------------------------
 // Maestrano SOA Host (Connec! URL)
+{% if connec_api_url is defined %}
+$mno_soa_host = '{{ connec_api_url }}';
+{% else %}
 $mno_soa_host = '{{ connec_hostname }}';
+{% endif %}
 
 // Maestrano REST API version
 $mno_soa_version = 'v1';
@@ -16,7 +20,11 @@ $mno_settings->soa_url = $mno_soa_host . '/'. $mno_soa_version .'/';
 // SSO Configuration
 //------------------------------------
 // Get Maestrano SSO Host (MNO URL)
+{% if hub_idp_url is defined %}
+$mno_sso_host = '{{ hub_idp_url }}';
+{% else %}
 $mno_sso_host = '{{ mno_hostname }}';
+{% endif %}
 
 // Endpoint to reach for SSO Identification
 $mno_settings->sso_url = $mno_sso_host . '/api/v1/auth/saml';
