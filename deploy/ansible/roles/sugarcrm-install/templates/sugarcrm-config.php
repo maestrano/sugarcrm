@@ -227,6 +227,7 @@ $sugar_config = array (
   'host_name' => '{{ server_hostname }}',
   'http_referer' => 
   array (
+    'weak' => true,
     'list' => 
     array (
       0 => 'application.maestrano.io',
