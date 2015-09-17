@@ -192,20 +192,15 @@ class UserPreference extends SugarBean
         )
     {
         global $sugar_config;
-        
-        $GLOBALS['log']->info('Begin UserPreference->loadPreferences');
-        
+
         $user = $this->_userFocus;
 
         if($user->object_name != 'User')
             return;
         if(!empty($user->id) && (!isset($_SESSION[$user->user_name . '_PREFERENCES'][$category]) || (!empty($_SESSION['unique_key']) && $_SESSION['unique_key'] != $sugar_config['unique_key']))) {
-            $GLOBALS['log']->info('During UserPreference->loadPreferences: calling reloadPreferences');
             // cn: moving this to only log when valid - throwing errors on install
             return $this->reloadPreferences($category);
         }
-        $GLOBALS['log']->info('During UserPreference->loadPreferences: preferences not loaded');
-        
         return false;
     }
 
@@ -216,34 +211,24 @@ class UserPreference extends SugarBean
      */
     public function reloadPreferences($category = 'global')
     {
-        $GLOBALS['log']->info("Begin UserPreference->reloadPreferences(".$category.")");
         $user = $this->_userFocus;
 
         if($user->object_name != 'User' || empty($user->id) || empty($user->user_name)) {
             return false;
         }
-        $GLOBALS['log']->info('Loading Preferences DB ' . $user->user_name);
+        $GLOBALS['log']->debug('Loading Preferences DB ' . $user->user_name);
         if(!isset($_SESSION[$user->user_name . '_PREFERENCES'])) $_SESSION[$user->user_name . '_PREFERENCES'] = array();
         if(!isset($user->user_preferences) || !is_array($user->user_preferences)) $user->user_preferences = array();
-        
-        $GLOBALS['log']->info("During UserPreference->reloadPreferences: Fetching user_preferences");
         $result = $GLOBALS['db']->query("SELECT contents FROM user_preferences WHERE assigned_user_id='$user->id' AND category = '" . $category . "' AND deleted = 0", false, 'Failed to load user preferences');
         $row = $GLOBALS['db']->fetchByAssoc($result);
-        
         if ($row) {
-            $GLOBALS['log']->info("During UserPreference->reloadPreferences: Retrieving row from result");
             $_SESSION[$user->user_name . '_PREFERENCES'][$category] = unserialize(base64_decode($row['contents']));
             $user->user_preferences[$category] = unserialize(base64_decode($row['contents']));
-            
-            $GLOBALS['log']->info("During UserPreference->reloadPreferences: returning true");
             return true;
         } else {
-          $GLOBALS['log']->info("During UserPreference->reloadPreferences: No row in result");
             $_SESSION[$user->user_name . '_PREFERENCES'][$category] = array();
             $user->user_preferences[$category] = array();
         }
-        
-        $GLOBALS['log']->info("During UserPreference->reloadPreferences: returning false");
         return false;
     }
 

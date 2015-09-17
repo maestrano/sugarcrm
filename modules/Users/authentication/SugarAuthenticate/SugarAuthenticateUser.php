@@ -90,7 +90,7 @@ class SugarAuthenticateUser{
 	function loadUserOnLogin($name, $password, $fallback = false, $PARAMS = array()) {
 		global $login_error;
 
-		$GLOBALS['log']->info("Begin SugarAuthenticateUser->loadUserOnLogin for ". $name);
+		$GLOBALS['log']->debug("Starting user load for ". $name);
 		if(empty($name) || empty($password)) return false;
 		$input_hash = $password;
 		$passwordEncrypted = false;
@@ -98,20 +98,14 @@ class SugarAuthenticateUser{
 			$passwordEncrypted = true;
 		}// if
 		if (!$passwordEncrypted) {
-      $GLOBALS['log']->info("During SugarAuthenticateUser->loadUserOnLogin: Encrypting password");
 			$input_hash = SugarAuthenticate::encodePassword($password);
 		} // if
-    
-    $GLOBALS['log']->info("During SugarAuthenticateUser->loadUserOnLogin: calling authenticateUser");
 		$user_id = $this->authenticateUser($name, $input_hash, $fallback);
 		if(empty($user_id)) {
 			$GLOBALS['log']->fatal('SECURITY: User authentication for '.$name.' failed');
 			return false;
 		}
-    $GLOBALS['log']->info("During SugarAuthenticateUser->loadUserOnLogin: authenticateUser successful");
-    $GLOBALS['log']->info("During SugarAuthenticateUser->loadUserOnLogin: loading user session");
 		$this->loadUserOnSession($user_id);
-    $GLOBALS['log']->info("During SugarAuthenticateUser->loadUserOnLogin: user session successfully loaded");
 		return true;
 	}
 	/**
@@ -121,21 +115,15 @@ class SugarAuthenticateUser{
 	 * @return boolean
 	 */
 	function loadUserOnSession($user_id=''){
-		$GLOBALS['log']->info("Begin SugarAuthenticateUser->loadUserOnSession");
-    
-    if(!empty($user_id)){
-      $GLOBALS['log']->info("During SugarAuthenticateUser->loadUserOnSession: Storing user id in session = " . $user_id);
+		if(!empty($user_id)){
 			$_SESSION['authenticated_user_id'] = $user_id;
 		}
 
 		if(!empty($_SESSION['authenticated_user_id']) || !empty($user_id)){
-      $GLOBALS['log']->info("During SugarAuthenticateUser->loadUserOnSession: Retrieving user to store in global");
 			$GLOBALS['current_user'] = new User();
 			if($GLOBALS['current_user']->retrieve($_SESSION['authenticated_user_id'])){
-        $GLOBALS['log']->info("During SugarAuthenticateUser->loadUserOnSession: User successfully retrieved and stored in global");
+
 				return true;
-			} else {
-			  $GLOBALS['log']->info("During SugarAuthenticateUser->loadUserOnSession: Error retrieving user!");
 			}
 		}
 		return false;

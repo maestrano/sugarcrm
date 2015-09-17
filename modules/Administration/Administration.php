@@ -163,10 +163,10 @@ class Administration extends SugarBean {
             $value = $this->encrpyt_before_save($value);
 
         if( $row_count == 0){
-            $result = $this->db->query("INSERT INTO config (value, category, name) VALUES ('$value','$category', '".$this->db->quote($value)."')");
+            $result = $this->db->query("INSERT INTO config (value, category, name) VALUES ('$value','$category', '$key')");
         }
         else{
-            $result = $this->db->query("UPDATE config SET value = '".$this->db->quote($value)."' WHERE category = '{$category}' AND name = '{$key}'");
+            $result = $this->db->query("UPDATE config SET value = '{$value}' WHERE category = '{$category}' AND name = '{$key}'");
         }
         sugar_cache_clear('admin_settings_cache');
         return $this->db->getAffectedRowCount($result);

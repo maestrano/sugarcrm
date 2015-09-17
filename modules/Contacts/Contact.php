@@ -43,8 +43,6 @@ if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
  ********************************************************************************/
 
 require_once('include/SugarObjects/templates/person/Person.php');
-require_once('maestrano/app/init/base.php');
-
 // Contact is used to store customer information.
 class Contact extends Person {
     var $field_name_map;

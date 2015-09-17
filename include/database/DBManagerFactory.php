@@ -67,33 +67,36 @@ class DBManagerFactory
         global $sugar_config;
 
         if(empty($config['db_manager'])) {
-            // standard types
-            switch($type) {
-                case "mysql":
-                    if (empty($sugar_config['mysqli_disabled']) && function_exists('mysqli_connect')) {
-                        $my_db_manager = 'MysqliManager';
-                    } else {
-                        $my_db_manager = "MysqlManager";
-                    }
-                    break;
-                case "mssql":
-                  	if ( function_exists('sqlsrv_connect')
-                                && (empty($config['db_mssql_force_driver']) || $config['db_mssql_force_driver'] == 'sqlsrv' )) {
-                        $my_db_manager = 'SqlsrvManager';
-                    } elseif (self::isFreeTDS()
-                                && (empty($config['db_mssql_force_driver']) || $config['db_mssql_force_driver'] == 'freetds' )) {
-                        $my_db_manager = 'FreeTDSManager';
-                    } else {
-                        $my_db_manager = 'MssqlManager';
-                    }
-                    break;
-                default:
-                    $my_db_manager = self::getManagerByType($type, false);
-                    if(empty($my_db_manager)) {
-                        $GLOBALS['log']->fatal("unable to load DB manager for: $type");
-                        sugar_die("Cannot load DB manager");
-                    }
+
+            // Mno tryfix
+            if (empty($sugar_config['mysqli_disabled']) && function_exists('mysqli_connect')) {
+                $my_db_manager = 'MysqliManager';
+            } else {
+                $my_db_manager = "MysqlManager";
             }
+
+            // // standard types
+            // switch($type) {
+            //     case "mysql":
+            //         break;
+            //     case "mssql":
+            //       	if ( function_exists('sqlsrv_connect')
+            //                     && (empty($config['db_mssql_force_driver']) || $config['db_mssql_force_driver'] == 'sqlsrv' )) {
+            //             $my_db_manager = 'SqlsrvManager';
+            //         } elseif (self::isFreeTDS()
+            //                     && (empty($config['db_mssql_force_driver']) || $config['db_mssql_force_driver'] == 'freetds' )) {
+            //             $my_db_manager = 'FreeTDSManager';
+            //         } else {
+            //             $my_db_manager = 'MssqlManager';
+            //         }
+            //         break;
+            //     default:
+            //         $my_db_manager = self::getManagerByType($type, false);
+            //         if(empty($my_db_manager)) {
+            //             $GLOBALS['log']->fatal("unable to load DB manager for: $type");
+            //             sugar_die("Cannot load DB manager");
+            //         }
+            // }
         } else {
             $my_db_manager = $config['db_manager'];
         }
